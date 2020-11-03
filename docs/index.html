@@ -6,24 +6,27 @@
 
     <title>Zea Template Svelte</title>
 
-    <link rel="icon" type="image/png" href="/favicon-16x16.png" />
+    <link rel="icon" type="image/png" href="favicon-16x16.png" />
 
-    <link rel="stylesheet" href="/global.css" />
-    <link rel="stylesheet" href="/build/bundle.css" />
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="build/bundle.css" />
 
     <!-- {{{ Zea's libs. -->
     <script src="https://websocket-staging.zea.live/socket.io/socket.io.js"></script>
-    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@2.2.4-rc/dist/index.umd.js" ></script>
-    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@2.1.2-rc/dist/index.umd.js" ></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-engine@2.2.4-rc/dist/index.umd.js"></script>
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-ux@2.1.2-rc/dist/index.umd.js"></script>
     <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-cad@2.2.0/dist/index.umd.js"></script>
-    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-collab@4/dist/index.umd.js"
+    <script crossorigin src="https://cdn.jsdelivr.net/npm/@zeainc/zea-collab@4/dist/index.umd.js"></script>
+    <script
+      crossorigin
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@zeainc/zea-web-components@2.0.0-rc6/dist/zea-web-components/zea-web-components.esm.js"
     ></script>
-    <script crossorigin type="module" src="https://cdn.jsdelivr.net/npm/@zeainc/zea-web-components@2.0.0-rc6/dist/zea-web-components/zea-web-components.esm.js"></script>
     <!-- }}} -->
 
     <script src="https://cdn.jsdelivr.net/npm/superagent"></script>
 
-    <script type="module" src="/build/bundle.js"></script>
+    <script type="module" src="build/bundle.js"></script>
   </head>
   <body></body>
 </html>

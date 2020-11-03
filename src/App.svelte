@@ -57,7 +57,6 @@
     cuttingPlaneXfo.ori.setFromAxisAndAngle(new Vec3(0, 1, 0), 1.55)
     cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
 
-
     const linearHandle = new LinearMovementHandle('linear1', 0.05, 0.002, new Color('#FF0000'))
     // linearHandle.setTargetParam(cuttingPlane.getParameter('GlobalXfo'))
     linearHandle.getParameter('LocalXfo').setValue(cuttingPlaneXfo)
@@ -98,7 +97,6 @@
 
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 0, 0), new Vec3(0, 0, 0))
 
-
     const toolbar = document.createElement('zea-toolbar')
     toolbar.tools = {
       cameraManipulator: {
@@ -106,7 +104,7 @@
         data: {
           iconName: 'camera-outline',
           toolName: 'Camera Manipulator',
-          callback:  () => useCameraManipulator(),
+          callback: () => useCameraManipulator(),
         },
       },
       measurementTool: {
@@ -114,7 +112,7 @@
         data: {
           iconName: 'resize-outline',
           toolName: 'Measurement Tool',
-          callback:  () => useMeasurementTool(),
+          callback: () => useMeasurementTool(),
         },
       },
       freeHandLineTool: {
@@ -123,7 +121,7 @@
           iconName: 'draw-freehand',
           iconType: 'zea',
           toolName: 'Free Hand Line Tool',
-          callback:  () => useFreeHandLineTool(),
+          callback: () => useFreeHandLineTool(),
         },
       },
       cuttingPlaneTool: {
@@ -131,9 +129,9 @@
         data: {
           iconName: 'cut-outline',
           toolName: 'Add Cutting Plane',
-          callback:  () => addCuttingPlane(),
+          callback: () => addCuttingPlane(),
         },
-      }
+      },
     }
 
     const sceneHost = document.getElementById('scene-host')
@@ -141,17 +139,28 @@
   })
 </script>
 
-<zea-layout orientation="vertical" cell-a-size="50" resize-cell-a="false" cell-b-size="100%" cell-c-size="0" resize-cell-c="false">
+<zea-layout
+  orientation="vertical"
+  cell-a-size="50"
+  resize-cell-a="false"
+  cell-b-size="100%"
+  cell-c-size="0"
+  resize-cell-c="false"
+>
   <!-- Header Start -->
   <div slot="a" class="App-header">
-    <img alt="ZEA logo" class="App-logo" src="/logo-zea.svg" />
+    <img alt="ZEA logo" class="App-logo" src="logo-zea.svg" />
     <div class="MenuHolder">
       <zea-menu type="dropdown" show-anchor="true">
         <zea-menu-item>
           Tools
           <zea-menu-subitems>
-            <zea-menu-item class="MenuItem" hotkey="c" id="camera-manipulator" callback={useCameraManipulator}>Camera Manipulator</zea-menu-item>
-            <zea-menu-item class="MenuItem" hotkey="m" id="measurement-tool" callback={useMeasurementTool}>Measurement Tool</zea-menu-item>
+            <zea-menu-item class="MenuItem" hotkey="c" id="camera-manipulator" callback={useCameraManipulator}>
+              Camera Manipulator
+            </zea-menu-item>
+            <zea-menu-item class="MenuItem" hotkey="m" id="measurement-tool" callback={useMeasurementTool}>
+              Measurement Tool
+            </zea-menu-item>
           </zea-menu-subitems>
         </zea-menu-item>
       </zea-menu>
@@ -167,14 +176,12 @@
   <zea-layout slot="b" cell-a-size="200" cell-b-size="100%" cell-c-size="0" resize-cell-c="false">
     <!-- Sidebar Start -->
     <zea-scroll-pane slot="a">
-      <zea-tree-view id="zea-tree-view"></zea-tree-view>
+      <zea-tree-view id="zea-tree-view" />
     </zea-scroll-pane>
     <!-- Sidebar Start -->
 
     <!-- Viewport Start -->
-    <div slot="b" id="scene-host">
-      <canvas bind:this={canvas} id="renderer" />
-    </div>
+    <div slot="b" id="scene-host"><canvas bind:this={canvas} id="renderer" /></div>
     <!-- Viewport Start -->
   </zea-layout>
 </zea-layout>
