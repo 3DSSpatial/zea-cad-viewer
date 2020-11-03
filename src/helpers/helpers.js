@@ -22,7 +22,7 @@ export const getAppData = (canvas) => {
   const renderer = new GLRenderer(canvas)
   const scene = new Scene()
 
-  scene.setupGrid(10, 10)
+  // scene.setupGrid(10, 10)
   renderer.setScene(scene)
 
   const appData = {
