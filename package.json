@@ -13,12 +13,18 @@
     "prettier": "^2.1.2",
     "prettier-plugin-svelte": "^1.4.1",
     "rollup": "^2.3.4",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-livereload": "^2.0.0",
     "rollup-plugin-svelte": "^6.0.0",
     "rollup-plugin-terser": "^7.0.0",
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "@zeainc/zea-cad": "^2.2.0",
+    "@zeainc/zea-collab": "^4.1.1",
+    "@zeainc/zea-engine": "^2.2.1",
+    "@zeainc/zea-ux": "^2.1.0",
+    "@zeainc/zea-web-components": "2.0.0-rc6",
     "sirv-cli": "^1.0.0"
   }
 }

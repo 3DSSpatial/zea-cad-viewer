@@ -2,7 +2,13 @@
   import { onMount } from 'svelte'
   import { getRamdomUser, getAppData } from './helpers/helpers.js'
   const { Xfo, Vec3, CuttingPlane, Color } = window.zeaEngine
-  const { MeasurementTool, CreateFreehandLineTool, LinearMovementHandle } = window.zeaUx
+  const {
+    MeasurementTool,
+    CreateFreehandLineTool,
+    LinearMovementHandle,
+    SelectionManager,
+    SelectionTool,
+  } = window.zeaUx
   import loadAsset from './loadAsset'
 
   const { Session, SessionSync } = window.zeaCollab
@@ -70,6 +76,30 @@
     scene = appData.scene
     renderer = appData.renderer
 
+    const selectionManager = new SelectionManager(appData, {
+      enableXfoHandles: true,
+    })
+
+    const cameraManipulator = renderer.getViewport().getManipulator()
+    const selectionTool = new SelectionTool({
+      selectionManager,
+      ...appData,
+    })
+    // appData.selectionManager = selectionManager
+
+    let selectionOn = false
+    const setToolToSelectionTool = () => {
+      selectionTool.activateTool()
+      renderer.getViewport().setManipulator(selectionTool)
+      selectionOn = true
+      selectionManager.showHandles('Translate')
+    }
+
+    const setToolToCameraManipulator = () => {
+      renderer.getViewport().setManipulator(cameraManipulator)
+      selectionOn = false
+    }
+
     const userData = await getRamdomUser()
 
     const socketUrl = 'https://websocket-staging.zea.live'
@@ -93,8 +123,6 @@
 
     freeHandLineTool = new CreateFreehandLineTool(appData)
 
-    cameraManipulator = renderer.getViewport().getManipulator()
-
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 0, 0), new Vec3(0, 0, 0))
 
     const toolbar = document.createElement('zea-toolbar')
@@ -104,7 +132,10 @@
         data: {
           iconName: 'camera-outline',
           toolName: 'Camera Manipulator',
-          callback: () => useCameraManipulator(),
+          callback: () => {
+            console.log('camera-outline')
+            // useCameraManipulator()
+          },
         },
       },
       measurementTool: {
@@ -141,7 +172,7 @@
 
 <zea-layout
   orientation="vertical"
-  cell-a-size="50"
+  cell-a-size="2"
   resize-cell-a="false"
   cell-b-size="100%"
   cell-c-size="0"
@@ -149,9 +180,9 @@
 >
   <!-- Header Start -->
   <div slot="a" class="App-header">
-    <img alt="ZEA logo" class="App-logo" src="logo-zea.svg" />
+    <img alt="ZEA logo" class="App-logo" src="images/logo-zea.svg" />
     <div class="MenuHolder">
-      <zea-menu type="dropdown" show-anchor="true">
+      <!-- <zea-menu type="dropdown" show-anchor="true">
         <zea-menu-item>
           Tools
           <zea-menu-subitems>
@@ -163,7 +194,7 @@
             </zea-menu-item>
           </zea-menu-subitems>
         </zea-menu-item>
-      </zea-menu>
+      </zea-menu> -->
     </div>
     <div class="UserChipSetHolder">
       <zea-user-chip-set bind:this={userChipSet} id="zea-user-chip-set" />

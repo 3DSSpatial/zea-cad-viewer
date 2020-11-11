@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import livereload from 'rollup-plugin-livereload'
 import { terser } from 'rollup-plugin-terser'
+import copy from 'rollup-plugin-copy'
 
 const production = !process.env.ROLLUP_WATCH
 
@@ -33,7 +34,7 @@ export default {
     sourcemap: true,
     format: 'iife',
     name: 'app',
-    file: 'docs/build/bundle.js',
+    file: 'public/build/bundle.js',
   },
   plugins: [
     svelte({
@@ -61,13 +62,28 @@ export default {
     // the bundle has been generated
     !production && serve(),
 
-    // Watch the `docs` directory and refresh the
+    // Watch the `public` directory and refresh the
     // browser on changes when not in production
-    !production && livereload('docs'),
+    !production && livereload('public'),
 
     // If we're building for production (npm run build
     // instead of npm run dev), minify
     production && terser(),
+
+    copy({
+      targets: [
+        { src: 'src/index.html', dest: 'public' },
+        { src: 'src/global.css', dest: 'public' },
+        // { src: ['assets/fonts/arial.woff', 'assets/fonts/arial.woff2'], dest: 'public/fonts' },
+        { src: 'src/images/**/*', dest: 'public/images' },
+        { src: 'src/assets/**/*', dest: 'public/assets' },
+        { src: 'node_modules/@zeainc/zea-engine/dist/*', dest: 'public/libs/zea-engine/dist' },
+        { src: 'node_modules/@zeainc/zea-engine/public-resources/*', dest: 'public/libs/zea-engine/public-resources' },
+        { src: 'node_modules/@zeainc/zea-cad/dist/*', dest: 'public/libs/zea-cad/dist' },
+        { src: 'node_modules/@zeainc/zea-ux/dist/*', dest: 'public/libs/zea-ux/dist' },
+        { src: 'node_modules/@zeainc/zea-collab/dist/*', dest: 'public/libs/zea-collab/dist' },
+      ],
+    }),
   ],
   watch: {
     clearScreen: false,
