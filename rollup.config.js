@@ -73,6 +73,7 @@ export default {
     copy({
       targets: [
         { src: 'src/index.html', dest: 'public' },
+        { src: 'src/host/embed.html', dest: 'public' },
         { src: 'src/host/ChannelMessenger.js', dest: 'public' },
         { src: 'src/global.css', dest: 'public' },
         // { src: ['assets/fonts/arial.woff', 'assets/fonts/arial.woff2'], dest: 'public/fonts' },

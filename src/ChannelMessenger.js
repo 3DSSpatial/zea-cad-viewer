@@ -5,15 +5,13 @@ class ChannelMessenger extends EventEmitter {
     super()
 
     // Listen for the initial port transfer message
-    window.addEventListener('message', initPort)
-
-    // Setup the transferred port
-    function initPort(e) {
+    window.addEventListener('message', (e) => {
       console.log('=====initPort=========')
+      // Setup the transferred port
       this.port2 = e.ports[0]
       this.port2.onmessage = onMessage
       this.port2.postMessage('ready')
-    }
+    })
 
     // Handle messages received on port2
     const onMessage = (e) => {

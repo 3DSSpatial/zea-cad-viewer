@@ -76,9 +76,6 @@
 
     const selectionTool = new SelectionTool(appData)
     // selectionManager.showHandles('Xfo')
-    selectionManager.on('selectionChanged', (event) => {
-      const { prevSelection, selection } = event
-    })
 
     const measurementTool = new MeasurementTool(appData)
     const freeHandLineTool = new CreateFreehandLineTool(appData)
@@ -228,34 +225,29 @@
     /////////////////////////////////
     // Setup Message Channel
 
-    // console.log('========================')
-    // let port2
-
     const client = new ChannelMessenger()
     client.on('loadCADFile', (data) => {
       console.log('loadCADFile', data)
 
+      if (!data.keep) {
+        assets.removeAllChildren()
+      }
+
       loadAsset(assets, appData, data)
     })
 
-    // // Listen for the initial port transfer message
-    // window.addEventListener('message', initPort)
+    client.on('unloadCADFile', (data) => {
+      console.log('unloadCADFile', data)
 
-    // // Setup the transferred port
-    // function initPort(e) {
-    //   console.log('=====initPort=========')
-    //   port2 = e.ports[0]
-    //   port2.onmessage = onMessage
-    //   port2.postMessage('ready')
-    // }
+      assets.removeChildByName(data.name)
+    })
 
-    // // Handle messages received on port2
-    // function onMessage(e) {
-    //   // const listItem = document.createElement('li')
-    //   // listItem.textContent = e.data
-    //   // list.appendChild(listItem)
-    //   console.log('Message received by IFrame: "' + e.data + '"')
-    // }
+    selectionManager.on('selectionChanged', (event) => {
+      const { selection } = event
+      const selectionPaths = []
+      selection.forEach((item) => selectionPaths.push(item.getPath().slice(2)))
+      client.send('selectionChanged', { selection: selectionPaths })
+    })
 
     ////////////////////////////////
     // Collab
