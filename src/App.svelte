@@ -44,10 +44,10 @@
       envMap.getParameter('FilePath').setValue('assets/HDR_029_Sky_Cloudy_Ref.vlenv')
       scene.setEnvMap(envMap)
     }
-    scene.getSettings().getParameter('BackgroundColor').setValue(new Color('#D9EAFA'))
+    // scene.getSettings().getParameter('BackgroundColor').setValue(new Color('#D9EAFA'))
 
-    // const color = new Color('#aaaaaa')
-    // scene.getSettings().getParameter('BackgroundColor').setValue(color)
+    const color = new Color('#aaaaaa')
+    scene.getSettings().getParameter('BackgroundColor').setValue(color)
 
     ////////////////////////////////
     //
@@ -159,8 +159,10 @@
     }
 
     let currentColor = new Color('yellow')
+    let setColorCb
     const setColor = (color) => {
       currentColor = color
+      if (setColorCb) setColorCb()
     }
 
     const toolbar = document.createElement('zea-toolbar')
@@ -185,6 +187,9 @@
           toolName: 'Measurement Tool',
           callback: () => {
             measurementTool.getParameter('Color').setValue(currentColor)
+            setColorCb = () => {
+              measurementTool.getParameter('Color').setValue(currentColor)
+            }
             pushTool('MeasurementTool')
           },
           offCallback: () => {
@@ -200,6 +205,9 @@
           toolName: 'Free Hand Line Tool',
           callback: () => {
             freeHandLineTool.getParameter('LineColor').setValue(currentColor)
+            setColorCb = () => {
+              freeHandLineTool.getParameter('LineColor').setValue(currentColor)
+            }
             pushTool('FreehandLineTool')
           },
           offCallback: () => {

@@ -34,7 +34,7 @@ export default {
     sourcemap: true,
     format: 'iife',
     name: 'app',
-    file: 'public/build/bundle.js',
+    file: 'public/viewer/build/bundle.js',
   },
   plugins: [
     svelte({
@@ -72,18 +72,18 @@ export default {
 
     copy({
       targets: [
-        { src: 'src/viewer.html', dest: 'public' },
+        { src: 'src/viewer.html', dest: 'public/viewer' },
         { src: 'src/host/embed.html', dest: 'public' },
         { src: 'src/host/ChannelMessenger.js', dest: 'public' },
-        { src: 'src/global.css', dest: 'public' },
-        // { src: ['assets/fonts/arial.woff', 'assets/fonts/arial.woff2'], dest: 'public/fonts' },
-        { src: 'src/images/**/*', dest: 'public/images' },
-        { src: 'src/assets/**/*', dest: 'public/assets' },
-        // { src: 'node_modules/@zeainc/zea-engine/dist/*', dest: 'public/libs/zea-engine/dist' },
-        // { src: 'node_modules/@zeainc/zea-engine/public-resources/*', dest: 'public/libs/zea-engine/public-resources' },
-        // { src: 'node_modules/@zeainc/zea-ux/dist/*', dest: 'public/libs/zea-ux/dist' },
-        { src: 'node_modules/@zeainc/zea-cad/dist/*', dest: 'public/libs/zea-cad/dist' },
-        { src: 'node_modules/@zeainc/zea-collab/dist/*', dest: 'public/libs/zea-collab/dist' },
+        { src: 'src/global.css', dest: 'public/viewer' },
+        // { src: ['assets/fonts/arial.woff', 'assets/fonts/arial.woff2'], dest: 'public/viewer/fonts' },
+        { src: 'src/images/**/*', dest: 'public/viewer/images' },
+        { src: 'src/assets/**/*', dest: 'public/viewer/assets' },
+        // { src: 'node_modules/@zeainc/zea-engine/dist/*', dest: 'public/viewer/libs/zea-engine/dist' },
+        // { src: 'node_modules/@zeainc/zea-engine/public-resources/*', dest: 'public/viewer/libs/zea-engine/public-resources' },
+        // { src: 'node_modules/@zeainc/zea-ux/dist/*', dest: 'public/viewer/libs/zea-ux/dist' },
+        { src: 'node_modules/@zeainc/zea-cad/dist/*', dest: 'public/viewer/libs/zea-cad/dist' },
+        { src: 'node_modules/@zeainc/zea-collab/dist/*', dest: 'public/viewer/libs/zea-collab/dist' },
       ],
     }),
   ],

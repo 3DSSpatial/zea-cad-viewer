@@ -6,7 +6,7 @@
 
     <title>Zea CAD Viewer - Embed</title>
 
-    <link rel="icon" type="image/png" href="images/favicon-16x16.png" />
+    <link rel="icon" type="image/png" href="favicon-16x16.png" />
     <style>
       #container {
         display: flex;
@@ -42,7 +42,7 @@
         <div class="loadbtn" id="HC_SRO4">HC_SRO4</div>
         <div id="output"></div>
       </div>
-      <iframe id="zea-cad-viewer" src="./viewer.html" allowfullscreen="allowfullscreen"></iframe>
+      <iframe id="zea-cad-viewer" src="./viewer/viewer.html" allowfullscreen="allowfullscreen"></iframe>
     </div>
     <script type="module">
       const viewer = document.getElementById('zea-cad-viewer')
@@ -60,7 +60,7 @@
 
       const servo_mestreBtn = document.getElementById('servo_mestre')
       servo_mestreBtn.addEventListener('click', () => {
-        const json = { url: 'assets/servo_mestre-visu.zcad' }
+        const json = { url: 'http://docs.zea.live/Zea-CAD-Viewer-Builds/assets/servo_mestre.zcad' }
         if (event.ctrlKey) {
           json.keep = true
         }
@@ -69,7 +69,7 @@
 
       const HC_SRO4Btn = document.getElementById('HC_SRO4')
       HC_SRO4Btn.addEventListener('click', () => {
-        const json = { url: 'assets/HC_SRO4.zcad' }
+        const json = { url: 'http://docs.zea.live/Zea-CAD-Viewer-Builds/assets/HC_SRO4.zcad' }
         if (event.ctrlKey) {
           json.keep = true
         }
