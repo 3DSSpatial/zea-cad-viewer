@@ -1,6 +1,6 @@
 <script>
   import { onMount } from 'svelte'
-  const { Color, GLRenderer, Scene, Xfo, Vec3, CuttingPlane, CameraManipulator } = window.zeaEngine
+  const { Color, GLRenderer, Scene, Xfo, Vec3, CuttingPlane, CameraManipulator, TreeItem } = window.zeaEngine
 
   const {
     MeasurementTool,
@@ -13,42 +13,12 @@
   import { setupCollab } from './setupCollab.js'
   import loadAsset from './loadAsset'
   import { ToolManager } from './ToolManager.js'
+  import { ChannelMessenger } from './ChannelMessenger.js'
 
   let canvas
   let userChip
   let userChipSet
   /*
-  const useMeasurementTool = () => {
-    if (renderer.getViewport().getManipulator() === measurementTool) {
-      renderer.getViewport().setManipulator(cameraManipulator)
-      canvas.style.cursor = 'auto'
-      return
-    }
-
-    renderer.getViewport().setManipulator(measurementTool)
-    canvas.style.cursor = 'cell'
-  }
-
-  const useCameraManipulator = () => {
-    renderer.getViewport().setManipulator(cameraManipulator)
-
-    freeHandLineTool.deactivateTool()
-    canvas.style.cursor = 'auto'
-  }
-
-  const useFreeHandLineTool = () => {
-    if (renderer.getViewport().getManipulator() === freeHandLineTool) {
-      freeHandLineTool.deactivateTool()
-      renderer.getViewport().setManipulator(cameraManipulator)
-      canvas.style.cursor = 'auto'
-      return
-    }
-
-    freeHandLineTool.activateTool()
-    renderer.getViewport().setManipulator(freeHandLineTool)
-    canvas.style.cursor = 'cell'
-  }
-
   const addCuttingPlane = () => {
     // Setting up the CuttingPlane
     cuttingPlane = new CuttingPlane('CuttingPlane')
@@ -70,7 +40,7 @@
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
 
-    scene.setupGrid(10, 10)
+    // scene.setupGrid(10, 10)
     renderer.setScene(scene)
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 2.5, 3), new Vec3(0, 0, 0))
 
@@ -81,8 +51,6 @@
       scene,
       renderer,
     }
-
-    setupCollab(appData, userChip, userChipSet)
 
     // ////////////////////////////////////////////
     // Setup SelectionManager
@@ -252,36 +220,46 @@
 
     ////////////////////////////////
     //
-    const asset = loadAsset(appData)
-    scene.getRoot().addChild(asset)
-    sceneTreeView.rootItem = asset
+    const assets = new TreeItem('-')
+    scene.getRoot().addChild(assets)
+    sceneTreeView.rootItem = assets
 
+    // loadAsset(assets, appData, { url: 'assets/servo_mestre-visu.zcad' })
     /////////////////////////////////
     // Setup Message Channel
 
-    let port2
+    // console.log('========================')
+    // let port2
 
-    // Listen for the initial port transfer message
-    window.addEventListener('message', initPort)
+    const client = new ChannelMessenger()
+    client.on('loadCADFile', (data) => {
+      console.log('loadCADFile', data)
 
-    // Setup the transferred port
-    function initPort(e) {
-      port2 = e.ports[0]
-      port2.onmessage = onMessage
-    }
+      loadAsset(assets, appData, data)
+    })
 
-    // Handle messages received on port2
-    function onMessage(e) {
-      // const listItem = document.createElement('li')
-      // listItem.textContent = e.data
-      // list.appendChild(listItem)
-      console.log('Message received by IFrame: "' + e.data + '"')
-      port2.postMessage('Message received by IFrame: "' + e.data + '"')
-    }
+    // // Listen for the initial port transfer message
+    // window.addEventListener('message', initPort)
 
-    setTimeout(() => {
-      if (port2) port2.postMessage('hello')
-    }, 3000)
+    // // Setup the transferred port
+    // function initPort(e) {
+    //   console.log('=====initPort=========')
+    //   port2 = e.ports[0]
+    //   port2.onmessage = onMessage
+    //   port2.postMessage('ready')
+    // }
+
+    // // Handle messages received on port2
+    // function onMessage(e) {
+    //   // const listItem = document.createElement('li')
+    //   // listItem.textContent = e.data
+    //   // list.appendChild(listItem)
+    //   console.log('Message received by IFrame: "' + e.data + '"')
+    // }
+
+    ////////////////////////////////
+    // Collab
+    // setupCollab(appData, userChip, userChipSet)
   })
 </script>
 
@@ -290,17 +268,17 @@
   cell-a-size="2"
   resize-cell-a="false"
   cell-b-size="100%"
-  cell-c-size="0"
+  cell-c-size="2"
   resize-cell-c="false"
 >
   <!-- Header Start -->
   <div slot="a" class="App-header">
-    <img alt="ZEA logo" class="App-logo" src="images/logo-zea.svg" />
+    <!-- <img alt="ZEA logo" class="App-logo" src="images/logo-zea.svg" />
     <div class="UserChipSetHolder">
       <zea-user-chip-set bind:this={userChipSet} id="zea-user-chip-set" />
     </div>
 
-    <zea-user-chip bind:this={userChip} id="zea-user-chip" />
+    <zea-user-chip bind:this={userChip} id="zea-user-chip" /> -->
   </div>
   <!-- Header End -->
 

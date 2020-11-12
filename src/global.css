@@ -20,11 +20,11 @@ body {
   --color-success-1: #80bb41;
   --color-success-2: #b0d687;
   --color-success-3: #3a452c;
-  --color-background-1: #1f1f1f;
-  --color-background-2: #333333;
+  --color-background-1: #dddddd;
+  --color-background-2: #dddddd;
   --color-background-3: #1f1f1f;
   --color-background-4: #111111;
-  --color-foreground-1: #dcdbdc;
+  --color-foreground-1: #1b1b1b;
   --color-foreground-2: #a0a0a0;
   --color-foreground-3: #7f7f7f;
   --color-grey-1: #2d2d2d;
@@ -91,7 +91,7 @@ body {
 
 zea-toolbar.hydrated {
   position: fixed;
-  top: 50%;
+  top: 30%;
   transform: translateY(-50%);
-  left: 70px;
+  left: 40px;
 }
