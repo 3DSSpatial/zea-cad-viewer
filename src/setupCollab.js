@@ -1,4 +1,5 @@
 const { Color, GLRenderer, Scene, MathFunctions } = window.zeaEngine
+const { Session, SessionSync } = window.zeaCollab
 
 export const getRamdomUser = async () => {
   // const res = await window.superagent.get('https://randomuser.me/api')
@@ -27,17 +28,16 @@ export const getRamdomUser = async () => {
   return userData
 }
 
-export const getAppData = (canvas) => {
-  const renderer = new GLRenderer(canvas)
-  const scene = new Scene()
+export const setupCollab = async (appData, userChip, userChipSet) => {
+  const userData = await getRamdomUser()
 
-  // scene.setupGrid(10, 10)
-  renderer.setScene(scene)
+  const socketUrl = 'https://websocket-staging.zea.live'
+  const session = new Session(userData, socketUrl)
+  session.joinRoom('zea-template-svelte')
 
-  const appData = {
-    scene,
-    renderer,
-  }
+  const sessionSync = new SessionSync(session, appData, userData, {})
+  userChipSet.session = session
+  userChip.userData = userData
 
-  return appData
+  return session
 }

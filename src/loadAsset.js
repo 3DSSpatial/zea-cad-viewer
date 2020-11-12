@@ -1,7 +1,7 @@
 const { Xfo, EulerAngles } = window.zeaEngine
 const { CADAsset } = window.zeaCad
 
-const loadAsset = () => {
+const loadAsset = (appData) => {
   const asset = new CADAsset()
   // const xfo = new Xfo()
   // xfo.sc.set(2);
@@ -9,6 +9,12 @@ const loadAsset = () => {
 
   // asset.getParameter('GlobalXfo').setValue(xfo)
   asset.getParameter('FilePath').setValue('assets/servo_mestre-visu.zcad')
+  asset.on('loaded', () => {
+    appData.renderer.frameAll()
+  })
+  asset.getGeometryLibrary().on('loaded', () => {
+    appData.renderer.frameAll()
+  })
 
   return asset
 }

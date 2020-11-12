@@ -93,5 +93,5 @@ zea-toolbar.hydrated {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  right: 70px;
+  left: 70px;
 }
