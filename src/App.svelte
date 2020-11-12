@@ -6,6 +6,7 @@
     MeasurementTool,
     CreateFreehandLineTool,
     LinearMovementHandle,
+    XfoHandle,
     SelectionManager,
     SelectionTool,
   } = window.zeaUx
@@ -18,23 +19,6 @@
   let canvas
   let userChip
   let userChipSet
-  /*
-  const addCuttingPlane = () => {
-    // Setting up the CuttingPlane
-    cuttingPlane = new CuttingPlane('CuttingPlane')
-    const cuttingPlaneXfo = new Xfo()
-    cuttingPlaneXfo.tr.set(0, 0, 0)
-    cuttingPlaneXfo.ori.setFromAxisAndAngle(new Vec3(0, 1, 0), 1.55)
-    cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
-
-    const linearHandle = new LinearMovementHandle('linear1', 0.05, 0.002, new Color('#FF0000'))
-    // linearHandle.setTargetParam(cuttingPlane.getParameter('GlobalXfo'))
-    linearHandle.getParameter('LocalXfo').setValue(cuttingPlaneXfo)
-    linearHandle.addChild(cuttingPlane, false)
-    scene.getRoot().addChild(linearHandle)
-    cuttingPlane.addItem(asset)
-  }
-*/
 
   onMount(async () => {
     const renderer = new GLRenderer(canvas)
@@ -46,6 +30,11 @@
 
     const color = new Color('#aaaaaa')
     scene.getSettings().getParameter('BackgroundColor').setValue(color)
+
+    ////////////////////////////////
+    //
+    const assets = new TreeItem('-')
+    scene.getRoot().addChild(assets)
 
     const appData = {
       scene,
@@ -64,6 +53,7 @@
     // Initializing the treeview
     const sceneTreeView = document.getElementById('zea-tree-view')
     sceneTreeView.appData = appData
+    sceneTreeView.rootItem = assets
 
     // ////////////////////////////////////////////
     // Setup Tools
@@ -90,6 +80,41 @@
     const measurementTool = new MeasurementTool(appData)
     const freeHandLineTool = new CreateFreehandLineTool(appData)
     freeHandLineTool.getParameter('LineThickness').setValue(0.001)
+
+    // /////////////////
+    // Cutting plane Tool
+    let cuttingPlane
+
+    const enableCuttingPlane = () => {
+      // Setting up the CuttingPlane
+      if (!cuttingPlane) {
+        cuttingPlane = new CuttingPlane('CuttingPlane')
+        cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
+        // const cuttingPlaneXfo = new Xfo()
+        // cuttingPlaneXfo.tr.set(0, 0, 0)
+        // cuttingPlaneXfo.ori.setFromAxisAndAngle(new Vec3(0, 1, 0), Math.PI * 0.5)
+        // cuttingPlane.getParameter('LocalXfo').setValue(cuttingPlaneXfo)
+
+        const xfoHandle = new XfoHandle(0.1, 0.002)
+        xfoHandle.setTargetParam(cuttingPlane.getParameter('GlobalXfo'))
+        cuttingPlane.addChild(xfoHandle, false)
+
+        scene.getRoot().addChild(cuttingPlane)
+        cuttingPlane.addItem(assets)
+      } else {
+        // cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
+        cuttingPlane.getParameter('Visible').setValue(true)
+
+        cuttingPlane.removeItem(assets)
+        cuttingPlane.addItem(assets)
+      }
+    }
+    const disableCuttingPlane = () => {
+      if (cuttingPlane) {
+        // cuttingPlane.getParameter('CutAwayEnabled').setValue(false)
+        cuttingPlane.getParameter('Visible').setValue(false)
+      }
+    }
 
     const toolManager = new ToolManager()
     toolManager.registerTool('CameraManipulator', cameraManipulator)
@@ -169,9 +194,9 @@
         data: {
           icon: 'cut-outline',
           toolName: 'Add Cutting Plane',
-          callback: () => addCuttingPlane(),
+          callback: () => enableCuttingPlane(),
           offCallback: () => {
-            popTool('FreehandLineTool')
+            disableCuttingPlane()
           },
         },
       },
@@ -222,14 +247,12 @@
             undoRedoManager.redo()
           }
           break
+        case 'f':
+          const selection = selectionManager.getSelection()
+          renderer.frameAll()
+          break
       }
     })
-
-    ////////////////////////////////
-    //
-    const assets = new TreeItem('-')
-    scene.getRoot().addChild(assets)
-    sceneTreeView.rootItem = assets
 
     // loadAsset(assets, appData, { url: 'assets/servo_mestre-visu.zcad' })
     /////////////////////////////////
