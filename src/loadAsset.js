@@ -7,6 +7,14 @@ const loadAsset = (parentItem, appData, data) => {
   // asset.on('loaded', () => {
   //   appData.renderer.frameAll()
   // })
+  asset.getMaterialLibrary().on('loaded', () => {
+    const materials = asset.getMaterialLibrary().getMaterials()
+    materials.forEach((material) => {
+      if (material.getShaderName() == 'SimpleSurfaceShader') {
+        material.setShaderName('StandardSurfaceShader')
+      }
+    })
+  })
   asset.getGeometryLibrary().on('loaded', () => {
     appData.renderer.frameAll()
   })

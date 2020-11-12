@@ -1,6 +1,17 @@
 <script>
   import { onMount } from 'svelte'
-  const { Color, GLRenderer, Scene, Xfo, Vec3, CuttingPlane, CameraManipulator, TreeItem } = window.zeaEngine
+  const {
+    SystemDesc,
+    Color,
+    GLRenderer,
+    Scene,
+    Xfo,
+    Vec3,
+    EnvMap,
+    CuttingPlane,
+    CameraManipulator,
+    TreeItem,
+  } = window.zeaEngine
 
   const {
     MeasurementTool,
@@ -28,8 +39,15 @@
     renderer.setScene(scene)
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 2.5, 3), new Vec3(0, 0, 0))
 
-    const color = new Color('#aaaaaa')
-    scene.getSettings().getParameter('BackgroundColor').setValue(color)
+    if (!SystemDesc.isMobileDevice) {
+      const envMap = new EnvMap('envMap')
+      envMap.getParameter('FilePath').setValue('assets/HDR_029_Sky_Cloudy_Ref.vlenv')
+      scene.setEnvMap(envMap)
+    }
+    scene.getSettings().getParameter('BackgroundColor').setValue(new Color('#D9EAFA'))
+
+    // const color = new Color('#aaaaaa')
+    // scene.getSettings().getParameter('BackgroundColor').setValue(color)
 
     ////////////////////////////////
     //
