@@ -76,6 +76,16 @@
 
     const selectionTool = new SelectionTool(appData)
     // selectionManager.showHandles('Xfo')
+    selectionTool.setSelectionFilter((item) => {
+      while (
+        item.getName().startsWith('Mesh') ||
+        item.getName().startsWith('Edge') ||
+        item.getName().startsWith('TreeItem')
+      ) {
+        item = item.getOwner()
+      }
+      return item
+    })
 
     const measurementTool = new MeasurementTool(appData)
     const freeHandLineTool = new CreateFreehandLineTool(appData)
@@ -274,7 +284,7 @@
   </div>
   <!-- Header End -->
 
-  <zea-layout slot="b" cell-a-size="2" cell-b-size="100%" cell-c-size="200" resize-cell-c="true">
+  <zea-layout slot="b" cell-a-size="2" resize-cell-a="false" cell-b-size="100%" cell-c-size="200" resize-cell-c="true">
     <!-- Viewport Start -->
     <div slot="b" id="scene-host"><canvas bind:this={canvas} id="renderer" /></div>
     <!-- Viewport Start -->
