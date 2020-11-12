@@ -64,7 +64,9 @@
         if (event.ctrlKey) {
           json.keep = true
         }
-        client.send('loadCADFile', json)
+        client.fetch('loadCADFile', json).then((data) => {
+          output.textContent = JSON.stringify(data)
+        })
       })
 
       const HC_SRO4Btn = document.getElementById('HC_SRO4')
@@ -73,7 +75,9 @@
         if (event.ctrlKey) {
           json.keep = true
         }
-        client.send('loadCADFile', json)
+        client.fetch('loadCADFile', json).then((data) => {
+          output.textContent = JSON.stringify(data)
+        })
       })
     </script>
   </body>

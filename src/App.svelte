@@ -24,6 +24,7 @@
 
   import { setupCollab } from './setupCollab.js'
   import loadAsset from './loadAsset'
+  import buildTree from './buildTree'
   import { ToolManager } from './ToolManager.js'
   import { ChannelMessenger } from './ChannelMessenger.js'
 
@@ -32,6 +33,8 @@
   let userChipSet
 
   onMount(async () => {
+    const client = new ChannelMessenger()
+
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
 
@@ -46,8 +49,13 @@
     }
     // scene.getSettings().getParameter('BackgroundColor').setValue(new Color('#D9EAFA'))
 
-    const color = new Color('#aaaaaa')
+    const color = new Color('#E9E7E9')
     scene.getSettings().getParameter('BackgroundColor').setValue(color)
+
+    client.on('setBackgroundColor', (data) => {
+      const color = new Color(data.color)
+      scene.getSettings().getParameter('BackgroundColor').setValue(color)
+    })
 
     ////////////////////////////////
     //
@@ -83,6 +91,8 @@
     // Selection Tool
 
     const selectionTool = new SelectionTool(appData)
+    // 3CB0F2
+
     // selectionManager.showHandles('Xfo')
     selectionTool.setSelectionFilter((item) => {
       while (
@@ -284,7 +294,6 @@
     /////////////////////////////////
     // Setup Message Channel
 
-    const client = new ChannelMessenger()
     client.on('loadCADFile', (data) => {
       console.log('loadCADFile', data)
 
@@ -292,7 +301,14 @@
         assets.removeAllChildren()
       }
 
-      loadAsset(assets, appData, data)
+      const asset = loadAsset(assets, appData, data)
+
+      if (data._id) {
+        asset.on('loaded', () => {
+          const tree = buildTree(asset)
+          client.send(data._id, { modelStructure: tree })
+        })
+      }
     })
 
     client.on('unloadCADFile', (data) => {
