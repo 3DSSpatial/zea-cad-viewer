@@ -62,21 +62,12 @@ class ChannelMessenger {
     }
   }
 
-  send(msg, payload) {
-    this.port1.postMessage([msg, payload])
-  }
-
-  fetch(msg, payload, timeout = 5000) {
+  do(msg, payload = {}, timeout = 5000) {
     return new Promise((resolve, reject) => {
       const id = ID()
       payload._id = id
       this.resolves[id] = resolve
       this.port1.postMessage([msg, payload])
-      setTimeout(() => {
-        if (this.resolves[id]) {
-          reject(`Unable to resolve ChannelMessenger.fetch with key: ${msg} and payload: ${payload} `)
-        }
-      }, timeout)
     })
   }
 

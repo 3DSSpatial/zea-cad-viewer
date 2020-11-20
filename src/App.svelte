@@ -32,6 +32,9 @@
   let userChip
   let userChipSet
 
+  const urlParams = new URLSearchParams(document.location.search)
+  const notree = urlParams.has('notree')
+
   onMount(async () => {
     const client = new ChannelMessenger()
 
@@ -44,6 +47,7 @@
 
     if (!SystemDesc.isMobileDevice) {
       const envMap = new EnvMap('envMap')
+      envMap.getParameter('HeadLightMode').setValue(true)
       envMap.getParameter('FilePath').setValue('assets/HDR_029_Sky_Cloudy_Ref.vlenv')
       scene.setEnvMap(envMap)
     }
@@ -77,9 +81,12 @@
 
     // ////////////////////////////////////////////
     // Initializing the treeview
-    const sceneTreeView = document.getElementById('zea-tree-view')
-    sceneTreeView.appData = appData
-    sceneTreeView.rootItem = assets
+    let sceneTreeView
+    if (!notree) {
+      sceneTreeView = document.getElementById('zea-tree-view')
+      sceneTreeView.appData = appData
+      sceneTreeView.items = []
+    }
 
     // ////////////////////////////////////////////
     // Setup Tools
@@ -149,8 +156,9 @@
     toolManager.registerTool('SelectionTool', selectionTool)
     toolManager.registerTool('FreehandLineTool', freeHandLineTool)
     toolManager.registerTool('MeasurementTool', measurementTool)
-    toolManager.pushTool('CameraManipulator')
+
     renderer.getViewport().setManipulator(toolManager)
+    toolManager.pushTool('CameraManipulator')
 
     let currentToolName = 'CameraManipulator'
     const pushTool = (toolName) => {
@@ -230,7 +238,12 @@
         data: {
           icon: 'cut-outline',
           toolName: 'Add Cutting Plane',
-          callback: () => enableCuttingPlane(),
+          callback: () => {
+            if (toolName != 'CameraManipulator') {
+              toolManager.popTool()
+            }
+            enableCuttingPlane()
+          },
           offCallback: () => {
             disableCuttingPlane()
           },
@@ -293,7 +306,6 @@
     // loadAsset(assets, appData, { url: 'assets/servo_mestre-visu.zcad' })
     /////////////////////////////////
     // Setup Message Channel
-
     client.on('loadCADFile', (data) => {
       console.log('loadCADFile', data)
 
@@ -301,10 +313,20 @@
         assets.removeAllChildren()
       }
 
-      const asset = loadAsset(assets, appData, data)
+      const asset = loadAsset(appData, data)
+
+      assets.addChild(asset)
 
       if (data._id) {
         asset.on('loaded', () => {
+          if (sceneTreeView) {
+            const assetArray = []
+            for (let i = 0; i < assets.getNumChildren(); i++) {
+              assetArray.push(assets.getChild(i))
+            }
+            sceneTreeView.items = assetArray
+          }
+
           const tree = buildTree(asset)
           client.send(data._id, { modelStructure: tree })
         })
@@ -349,15 +371,27 @@
   </div>
   <!-- Header End -->
 
-  <zea-layout slot="b" cell-a-size="2" resize-cell-a="false" cell-b-size="100%" cell-c-size="200" resize-cell-c="true">
-    <!-- Viewport Start -->
+  {#if notree}
     <div slot="b" id="scene-host"><canvas bind:this={canvas} id="renderer" /></div>
-    <!-- Viewport Start -->
+  {:else}
+    <zea-layout
+      slot="b"
+      cell-a-size="2"
+      resize-cell-a="false"
+      cell-b-size="100%"
+      cell-c-size="200"
+      resize-cell-c="true"
+    >
+      <!-- Viewport Start -->
+      <div slot="b" id="scene-host"><canvas bind:this={canvas} id="renderer" /></div>
+      <!-- Viewport Start -->
 
-    <!-- Sidebar Start -->
-    <zea-scroll-pane slot="c">
-      <zea-tree-view id="zea-tree-view" />
-    </zea-scroll-pane>
-    <!-- Sidebar Start -->
-  </zea-layout>
+      <!-- Sidebar Start -->
+
+      <zea-scroll-pane slot="c">
+        <zea-tree-view id="zea-tree-view" />
+      </zea-scroll-pane>
+      <!-- Sidebar End -->
+    </zea-layout>
+  {/if}
 </zea-layout>

@@ -1,7 +1,7 @@
 const { Xfo, EulerAngles } = window.zeaEngine
 const { CADAsset } = window.zeaCad
 
-const loadAsset = (parentItem, appData, data) => {
+const loadAsset = (appData, data) => {
   const asset = new CADAsset()
   asset.getParameter('FilePath').setValue(data.url)
   // asset.on('loaded', () => {
@@ -19,7 +19,6 @@ const loadAsset = (parentItem, appData, data) => {
     appData.renderer.frameAll()
   })
 
-  parentItem.addChild(asset)
   return asset
 }
 
