@@ -82,7 +82,7 @@ export default {
         // { src: 'node_modules/@zeainc/zea-engine/dist/*', dest: 'public/viewer/libs/zea-engine/dist' },
         // { src: 'node_modules/@zeainc/zea-engine/public-resources/*', dest: 'public/viewer/libs/zea-engine/public-resources' },
         // { src: 'node_modules/@zeainc/zea-ux/dist/*', dest: 'public/viewer/libs/zea-ux/dist' },
-        { src: 'node_modules/@zeainc/zea-cad/dist/*', dest: 'public/viewer/libs/zea-cad/dist' },
+        // { src: 'node_modules/@zeainc/zea-cad/dist/*', dest: 'public/viewer/libs/zea-cad/dist' },
         { src: 'node_modules/@zeainc/zea-collab/dist/*', dest: 'public/viewer/libs/zea-collab/dist' },
       ],
     }),
