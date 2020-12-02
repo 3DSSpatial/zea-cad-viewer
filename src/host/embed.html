@@ -8,41 +8,63 @@
 
     <link rel="icon" type="image/png" href="favicon-16x16.png" />
     <style>
-      #container {
+      body {
         display: flex;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        margin: 0;
       }
-      .loadbtns {
+      #leftpanel {
+        width: 450px;
+        display: flex;
+        flex-direction: column;
+      }
+      #rightpanel {
+        flex-grow: 1;
+      }
+      #buttonWrapper {
+        display: flex;
+      }
+      #output {
+        flex-grow: 1;
+      }
+      .btns {
         width: 300px;
         /* display: flex; */
       }
-      .loadbtn {
+      .btn {
         border-radius: 5px;
-        border: 2px solid #73ad21;
+        border: 2px solid #f9ce03;
         padding: 5px;
         margin: 5px;
         width: 200px;
-        height: 20px;
+        height: 40px;
         text-align: center;
       }
-      .loadbtn:hover {
-        background-color: #73ad21;
+      .btn:hover {
+        background-color: #f9ce03;
       }
       #zea-cad-viewer {
         margin-left: auto;
-        width: 100%;
+        width: 90%;
         height: 600px;
       }
     </style>
   </head>
   <body>
-    <div id="container">
-      <div class="loadbtns">
-        <div class="loadbtn" id="servo_mestre">servo_mestre</div>
-        <div class="loadbtn" id="HC_SRO4">HC_SRO4</div>
-        <div id="output"></div>
+    <div id="leftpanel">
+      <div id="buttonWrapper">
+        <div class="btns">
+          <button class="btn" id="servo_mestre">servo_mestre</button>
+          <button class="btn" id="HC_SRO4">HC_SRO4</button>
+          <button class="btn" id="Dead_eye_bearing">Dead_eye_bearing</button>
+        </div>
       </div>
-      <iframe id="zea-cad-viewer" src="./viewer/viewer.html?notree"></iframe>
+      <div id="output"></div>
+    </div>
+    <div id="rightpanel">
+      <iframe id="zea-cad-viewer" src="./viewer/viewer.html"></iframe>
     </div>
     <script type="module">
       const viewer = document.getElementById('zea-cad-viewer')
@@ -62,7 +84,7 @@
 
       const servo_mestreBtn = document.getElementById('servo_mestre')
       servo_mestreBtn.addEventListener('click', () => {
-        const json = { url: 'http://docs.zea.live/Zea-CAD-Viewer-Builds/assets/servo_mestre.zcad' }
+        const json = { url: '../assets/servo_mestre.zcad' }
         if (event.ctrlKey) {
           json.keep = true
         }
@@ -73,7 +95,18 @@
 
       const HC_SRO4Btn = document.getElementById('HC_SRO4')
       HC_SRO4Btn.addEventListener('click', () => {
-        const json = { url: 'http://docs.zea.live/Zea-CAD-Viewer-Builds/assets/HC_SRO4.zcad' }
+        const json = { url: '../assets/HC_SRO4.zcad' }
+        if (event.ctrlKey) {
+          json.keep = true
+        }
+        client.do('loadCADFile', json).then((data) => {
+          output.textContent = JSON.stringify(data)
+        })
+      })
+
+      const Dead_eye_bearingSTEPBtn = document.getElementById('Dead_eye_bearing')
+      Dead_eye_bearingSTEPBtn.addEventListener('click', () => {
+        const json = { url: '../assets/Dead_eye_bearingSTEP.zcad' }
         if (event.ctrlKey) {
           json.keep = true
         }
