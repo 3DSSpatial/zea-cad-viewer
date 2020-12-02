@@ -11,22 +11,22 @@
     CuttingPlane,
     CameraManipulator,
     TreeItem,
+    Material,
+    Sphere,
+    GeomItem,
+    GLBoundingBoxPass,
   } = window.zeaEngine
 
-  const {
-    MeasurementTool,
-    CreateFreehandLineTool,
-    LinearMovementHandle,
-    XfoHandle,
-    SelectionManager,
-    SelectionTool,
-  } = window.zeaUx
+  const { GLCADPass } = window.zeaCad
+
+  const { CreateFreehandLineTool, LinearMovementHandle, XfoHandle, SelectionManager, SelectionTool } = window.zeaUx
 
   import { setupCollab } from './setupCollab.js'
   import loadAsset from './loadAsset'
   import buildTree from './buildTree'
   import { ToolManager } from './ToolManager.js'
   import { ChannelMessenger } from './ChannelMessenger.js'
+  import { MeasurementTool } from './MeasurementTool.js'
 
   let canvas
   let userChip
@@ -41,7 +41,9 @@
     const renderer = new GLRenderer(canvas)
     const scene = new Scene()
 
-    // scene.setupGrid(10, 10)
+    renderer.addPass(new GLCADPass())
+
+    scene.setupGrid(10, 10)
     renderer.setScene(scene)
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 2.5, 3), new Vec3(0, 0, 0))
 
@@ -59,6 +61,10 @@
     client.on('setBackgroundColor', (data) => {
       const color = new Color(data.color)
       scene.getSettings().getParameter('BackgroundColor').setValue(color)
+
+      if (data._id) {
+        client.send(data._id, { done: true })
+      }
     })
 
     ////////////////////////////////
@@ -100,7 +106,6 @@
     const selectionTool = new SelectionTool(appData)
     // 3CB0F2
 
-    // selectionManager.showHandles('Xfo')
     selectionTool.setSelectionFilter((item) => {
       while (
         item.getName().startsWith('Mesh') ||
@@ -125,10 +130,6 @@
       if (!cuttingPlane) {
         cuttingPlane = new CuttingPlane('CuttingPlane')
         cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
-        // const cuttingPlaneXfo = new Xfo()
-        // cuttingPlaneXfo.tr.set(0, 0, 0)
-        // cuttingPlaneXfo.ori.setFromAxisAndAngle(new Vec3(0, 1, 0), Math.PI * 0.5)
-        // cuttingPlane.getParameter('LocalXfo').setValue(cuttingPlaneXfo)
 
         const xfoHandle = new XfoHandle(0.1, 0.002)
         xfoHandle.setTargetParam(cuttingPlane.getParameter('GlobalXfo'))
@@ -137,7 +138,6 @@
         scene.getRoot().addChild(cuttingPlane)
         cuttingPlane.addItem(assets)
       } else {
-        // cuttingPlane.getParameter('CutAwayEnabled').setValue(true)
         cuttingPlane.getParameter('Visible').setValue(true)
 
         cuttingPlane.removeItem(assets)
@@ -146,7 +146,6 @@
     }
     const disableCuttingPlane = () => {
       if (cuttingPlane) {
-        // cuttingPlane.getParameter('CutAwayEnabled').setValue(false)
         cuttingPlane.getParameter('Visible').setValue(false)
       }
     }
@@ -239,7 +238,7 @@
           icon: 'cut-outline',
           toolName: 'Add Cutting Plane',
           callback: () => {
-            if (toolName != 'CameraManipulator') {
+            if (currentToolName != 'CameraManipulator') {
               toolManager.popTool()
             }
             enableCuttingPlane()
@@ -303,7 +302,6 @@
       }
     })
 
-    // loadAsset(assets, appData, { url: 'assets/servo_mestre-visu.zcad' })
     /////////////////////////////////
     // Setup Message Channel
     client.on('loadCADFile', (data) => {
@@ -315,10 +313,14 @@
 
       const asset = loadAsset(appData, data)
 
+      asset.once('loaded', () => {
+        renderer.frameAll()
+      })
+
       assets.addChild(asset)
 
       if (data._id) {
-        asset.on('loaded', () => {
+        asset.once('loaded', () => {
           if (sceneTreeView) {
             const assetArray = []
             for (let i = 0; i < assets.getNumChildren(); i++) {
@@ -337,7 +339,72 @@
       console.log('unloadCADFile', data)
 
       assets.removeChildByName(data.name)
+
+      if (data._id) {
+        client.send(data._id, { done: true })
+      }
     })
+
+    // //////////////////////////////////////////////////////
+    // Debugging
+
+    const boundingBoxPass = new GLBoundingBoxPass()
+    renderer.addPass(boundingBoxPass)
+    boundingBoxPass.addTreeItem(assets, true)
+
+    client.emit('loadCADFile', { url: '../assets/Dead_eye_bearingSTEP.zcad' })
+
+    // const ballMaterial = new Material('ball', 'HandleShader')
+    // ballMaterial.getParameter('BaseColor').setValue(new Color(1, 0, 0))
+    // ballMaterial.getParameter('MaintainScreenSize').setValue(true)
+
+    // const sphere = new Sphere(0.003)
+    // const markerGeomItem0 = new GeomItem('Sphere0', sphere, ballMaterial)
+    // scene.getRoot().addChild(markerGeomItem0)
+    // const globalXfoParam0 = markerGeomItem0.getParameter('GlobalXfo')
+    // const markerGeomItem1 = new GeomItem('Sphere0', sphere, ballMaterial)
+    // scene.getRoot().addChild(markerGeomItem1)
+    // const globalXfoParam1 = markerGeomItem1.getParameter('GlobalXfo')
+
+    // let snapTarget
+    // renderer.getViewport().on('pointerMove', (event) => {
+    //   // console.log('pointerMove', event.pointerRay.toString())
+
+    //   if (pointerDown) {
+    //     const param = event.pointerRay.closestPoint(snapTarget.point)
+    //     if (param > 0) {
+    //       const pointOnRay = event.pointerRay.start.add(event.pointerRay.dir.scale(param))
+    //       markerGeomItem1.getParameter('Visible').setValue(true)
+    //       globalXfoParam1.setValue(new Xfo(pointOnRay))
+    //     }
+    //   } else {
+    //     const data = { ray: event.pointerRay, tolerance: 0.005 }
+    //     assets.query('closestEdgeOrSurface', data).then((results) => {
+    //       if (results) {
+    //         markerGeomItem0.getParameter('Visible').setValue(true)
+    //         globalXfoParam0.setValue(new Xfo(results.point))
+    //         snapTarget = results
+    //       } else {
+    //         markerGeomItem0.getParameter('Visible').setValue(false)
+    //         snapTarget = null
+    //       }
+    //     })
+    //   }
+    // })
+    // let pointerDown = false
+    // renderer.getViewport().on('pointerDown', (event) => {
+    //   if (snapTarget) {
+    //     pointerDown = true
+    //     event.stopPropagation()
+    //   }
+    // })
+    // renderer.getViewport().on('pointerUp', (event) => {
+    //   if (snapTarget) {
+    //     pointerDown = false
+    //     event.stopPropagation()
+    //   }
+    // })
+    // //////////////////////////////////////////////////////
 
     selectionManager.on('selectionChanged', (event) => {
       const { selection } = event
