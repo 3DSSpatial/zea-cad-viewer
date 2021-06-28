@@ -1,0 +1,3 @@
+const menuKey = {}
+
+export { menuKey }

@@ -1,0 +1,63 @@
+/* Rules for sizing the icon. */
+.material-icons.md-18 {
+  font-size: 18px;
+}
+.material-icons.md-24 {
+  font-size: 24px;
+}
+.material-icons.md-36 {
+  font-size: 36px;
+}
+.material-icons.md-48 {
+  font-size: 48px;
+}
+
+/* Rules for using icons as black on a light background. */
+.material-icons.md-dark {
+  color: rgba(0, 0, 0, 0.54);
+}
+.material-icons.md-dark.md-inactive {
+  color: rgba(0, 0, 0, 0.26);
+}
+
+/* Rules for using icons as white on a dark background. */
+.material-icons.md-light {
+  color: rgba(255, 255, 255, 1);
+}
+.material-icons.md-light.md-inactive {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+html,
+body,
+#routify-app {
+  height: 100%;
+}
+
+.viewIconColoredFace {
+  fill: #f9ce03;
+}
+.viewIconFrontFace {
+  fill: #ceac03;
+}
+.viewIconDarkerFace {
+  fill: #b19301;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+/* Rules for menu, menu options and dialog */
+:global(:root){
+  --color-background-1: rgb(0,0,0);
+  --color-background-2: rgba(114, 109, 109, 0.5);
+  --color-foreground-1: rgb(254, 254, 255);
+  --color-foreground-2: rgba(145, 138, 16, 0.8);
+} 

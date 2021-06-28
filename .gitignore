@@ -1,0 +1,8 @@
+node_modules/
+dist/
+scripts/
+.DS_Store
+.history
+src/tmp/
+.routify/
+assets/build/
