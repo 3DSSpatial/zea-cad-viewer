@@ -3,9 +3,16 @@ import { derived, readable } from 'svelte/store'
 
 import type { Auth0Client, User } from '@auth0/auth0-spa-js'
 
+// const auth0ClientOptions = {
+//   client_id: 'cSxWDidNyUAzvrz4Y1UGk1XHg55NoQRr',
+//   domain: 'zea-development.auth0.com',
+//   redirect_uri: `${window.location.origin}/sign-in-callback`,
+//   audience: 'cloud-api.zea.live',
+// }
+
 const auth0ClientOptions = {
-  client_id: 'cSxWDidNyUAzvrz4Y1UGk1XHg55NoQRr',
-  domain: 'zea-development.auth0.com',
+  client_id: 'p6VtJXuHxzMbduitjEwHo8Aog8KoFAHe',
+  domain: 'zea-staging.auth0.com',
   redirect_uri: `${window.location.origin}/sign-in-callback`,
   audience: 'cloud-api.zea.live',
 }

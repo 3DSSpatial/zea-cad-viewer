@@ -6,7 +6,9 @@
   $: if ($authClient) {
     $authClient.isAuthenticated().then((isAuthenticated) => {
       if (!isAuthenticated) {
-        $authClient.loginWithRedirect()
+        $authClient.loginWithRedirect({
+          redirect_uri: `${window.location.origin}/sign-in-callback${window.location.search}`,
+        })
       }
     })
   }

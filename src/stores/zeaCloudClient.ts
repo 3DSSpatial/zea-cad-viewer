@@ -22,7 +22,8 @@ const zeaCloudClient = derived<typeof authClient, ZeaCloudClient>(
 
     const client = createZeaCloudClient({
       token,
-      environmentTag: 'development',
+      // environmentTag: 'development',
+      environmentTag: 'staging',
     })
 
     cachedZeaCloudClient = client

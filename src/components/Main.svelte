@@ -103,30 +103,29 @@
   }
   /** LOAD ASSETS METHODS END */
 
-  /* {{{ Zea Cloud Cliend. */
+  /* {{{ Zea Cloud Client. */
   $: if ($zeaCloudClient) {
     const organizationId = urlParams.get('organization-id')
+    const projectId = urlParams.get('project-id')
+    const fileId = urlParams.get('file-id')
+
     $zeaCloudClient.findOrganization(organizationId).then((organization) => {
-      console.info('Organization name:', organization.getName())
-
-      const projectId = urlParams.get('project-id')
       organization.findProject(projectId).then((project) => {
-        console.info('Project name:', project.getName())
-
         project.fetchLatestVersion().then(() => {
-          const fileId = urlParams.get('file-id')
           const file = project.getFileById(fileId)
-          file.getSignedUrlForReading('cad', 'output.zcad').then((response) => {
-            console.info('Signed URL for reading:', response.signedUrl)
-
-            let assetUrl = response.signedUrl
-            loadAsset(assetUrl, assetUrl)
-          })
+          const processName = 'cad'
+          const filename = 'output.zcad'
+          file
+            .getSignedUrlForReading(processName, filename)
+            .then((response) => {
+              let assetUrl = response.signedUrl
+              loadAsset(assetUrl, filename)
+            })
         })
       })
     })
   }
-  /* }}} Zea Cloud Cliend. */
+  /* }}} Zea Cloud Client. */
 
   onMount(async () => {
     renderer = new GLRenderer(canvas)

@@ -6,11 +6,14 @@
   import { authClient } from '../../stores/auth'
 
   $: if ($authClient) {
-    const query = window.location.search
+    const urlParams = new URLSearchParams(window.location.search)
 
-    if (query.includes('code=') && query.includes('state=')) {
+    if (urlParams.has('code') && urlParams.has('state')) {
       $authClient.handleRedirectCallback().then(() => {
-        $redirect('/')
+        urlParams.delete('code')
+        urlParams.delete('state')
+
+        $redirect(`/?${urlParams.toString()}`)
       })
     }
   }
