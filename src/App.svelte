@@ -19,7 +19,14 @@
 
   const { GLCADPass } = window.zeaCad
 
-  const { CreateFreehandLineTool, LinearMovementHandle, XfoHandle, SelectionManager, SelectionTool } = window.zeaUx
+  const {
+    CreateFreehandLineTool,
+    LinearMovementHandle,
+    XfoHandle,
+    SelectionManager,
+    SelectionTool,
+    UndoRedoManager,
+  } = window.zeaUx
 
   import { setupCollab } from './setupCollab.js'
   import loadAsset from './loadAsset'
@@ -43,7 +50,7 @@
 
     renderer.addPass(new GLCADPass())
 
-    scene.setupGrid(10, 10)
+    // scene.setupGrid(10, 10)
     renderer.setScene(scene)
     renderer.getViewport().getCamera().setPositionAndTarget(new Vec3(2.5, 2.5, 3), new Vec3(0, 0, 0))
 
@@ -253,24 +260,39 @@
         data: {
           colors: {
             color1: {
-              background: 'yellow',
-              foreground: 'white',
-              callback: (e) => setColor(new Color('yellow')),
-            },
-            color2: {
               background: 'red',
               foreground: 'white',
               callback: (e) => setColor(new Color('#FF0000')),
             },
-            color3: {
+            color2: {
               background: 'green',
               foreground: 'white',
               callback: (e) => setColor(new Color('#00FF00')),
             },
-            color4: {
+            color3: {
               background: 'blue',
               foreground: 'white',
               callback: (e) => setColor(new Color('#0000FF')),
+            },
+            color4: {
+              background: 'yellow',
+              foreground: 'white',
+              callback: (e) => setColor(new Color('yellow')),
+            },
+            color5: {
+              background: 'brown',
+              foreground: 'white',
+              callback: (e) => setColor(new Color('brown')),
+            },
+            color6: {
+              background: 'orange',
+              foreground: 'white',
+              callback: (e) => setColor(new Color('orange')),
+            },
+            color7: {
+              background: 'pink',
+              foreground: 'white',
+              callback: (e) => setColor(new Color('pink')),
             },
           },
         },
@@ -312,27 +334,23 @@
       }
 
       const asset = loadAsset(appData, data)
+      assets.addChild(asset)
 
       asset.once('loaded', () => {
         renderer.frameAll()
-      })
-
-      assets.addChild(asset)
-
-      if (data._id) {
-        asset.once('loaded', () => {
-          if (sceneTreeView) {
-            const assetArray = []
-            for (let i = 0; i < assets.getNumChildren(); i++) {
-              assetArray.push(assets.getChild(i))
-            }
-            sceneTreeView.items = assetArray
+        if (sceneTreeView) {
+          const assetArray = []
+          for (let i = 0; i < assets.getNumChildren(); i++) {
+            assetArray.push(assets.getChild(i))
           }
+          sceneTreeView.items = assetArray
+        }
 
+        if (data._id) {
           const tree = buildTree(asset)
           client.send(data._id, { modelStructure: tree })
-        })
-      }
+        }
+      })
     })
 
     client.on('unloadCADFile', (data) => {
@@ -344,66 +362,17 @@
         client.send(data._id, { done: true })
       }
     })
+    if (urlParams.has('zcad')) {
+      client.emit('loadCADFile', { url: urlParams.get('zcad') })
+    }
 
     // //////////////////////////////////////////////////////
     // Debugging
 
-    const boundingBoxPass = new GLBoundingBoxPass()
-    renderer.addPass(boundingBoxPass)
-    boundingBoxPass.addTreeItem(assets, true)
+    // const boundingBoxPass = new GLBoundingBoxPass()
+    // renderer.addPass(boundingBoxPass)
+    // boundingBoxPass.addTreeItem(assets, true)
 
-    client.emit('loadCADFile', { url: '../assets/Dead_eye_bearingSTEP.zcad' })
-
-    // const ballMaterial = new Material('ball', 'HandleShader')
-    // ballMaterial.getParameter('BaseColor').setValue(new Color(1, 0, 0))
-    // ballMaterial.getParameter('MaintainScreenSize').setValue(true)
-
-    // const sphere = new Sphere(0.003)
-    // const markerGeomItem0 = new GeomItem('Sphere0', sphere, ballMaterial)
-    // scene.getRoot().addChild(markerGeomItem0)
-    // const globalXfoParam0 = markerGeomItem0.getParameter('GlobalXfo')
-    // const markerGeomItem1 = new GeomItem('Sphere0', sphere, ballMaterial)
-    // scene.getRoot().addChild(markerGeomItem1)
-    // const globalXfoParam1 = markerGeomItem1.getParameter('GlobalXfo')
-
-    // let snapTarget
-    // renderer.getViewport().on('pointerMove', (event) => {
-    //   // console.log('pointerMove', event.pointerRay.toString())
-
-    //   if (pointerDown) {
-    //     const param = event.pointerRay.closestPoint(snapTarget.point)
-    //     if (param > 0) {
-    //       const pointOnRay = event.pointerRay.start.add(event.pointerRay.dir.scale(param))
-    //       markerGeomItem1.getParameter('Visible').setValue(true)
-    //       globalXfoParam1.setValue(new Xfo(pointOnRay))
-    //     }
-    //   } else {
-    //     const data = { ray: event.pointerRay, tolerance: 0.005 }
-    //     assets.query('closestEdgeOrSurface', data).then((results) => {
-    //       if (results) {
-    //         markerGeomItem0.getParameter('Visible').setValue(true)
-    //         globalXfoParam0.setValue(new Xfo(results.point))
-    //         snapTarget = results
-    //       } else {
-    //         markerGeomItem0.getParameter('Visible').setValue(false)
-    //         snapTarget = null
-    //       }
-    //     })
-    //   }
-    // })
-    // let pointerDown = false
-    // renderer.getViewport().on('pointerDown', (event) => {
-    //   if (snapTarget) {
-    //     pointerDown = true
-    //     event.stopPropagation()
-    //   }
-    // })
-    // renderer.getViewport().on('pointerUp', (event) => {
-    //   if (snapTarget) {
-    //     pointerDown = false
-    //     event.stopPropagation()
-    //   }
-    // })
     // //////////////////////////////////////////////////////
 
     selectionManager.on('selectionChanged', (event) => {
