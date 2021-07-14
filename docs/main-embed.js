@@ -23,20 +23,44 @@ const setupLoadBtn = (name, url) => {
       })
   })
 }
-setupLoadBtn('Gearbox', `/data/gear_box_final_asm-visu.zcad`)
+setupLoadBtn(
+  'Gearbox',
+  document.location.origin + `/data/gear_box_final_asm.zcad`
+)
 setupLoadBtn(
   'Hospital_Structural',
-  '/data/Hospital/Autodesk_Hospital_Structural.zcad'
+  document.location.origin + '/data/Hospital/Autodesk_Hospital_Structural.zcad'
 )
-setupLoadBtn('Hospital_HVAC', '/data/Hospital/Autodesk_Hospital_HVAC.zcad')
+setupLoadBtn(
+  'Hospital_HVAC',
+  document.location.origin + '/data/Hospital/Autodesk_Hospital_HVAC.zcad'
+)
 
 /* Background color */
-const colorPicker = document.getElementById('background-color')
+document
+  .getElementById('background-color')
+  .addEventListener('input', (event) => {
+    if (loaded) {
+      client.do('setBackgroundColor', { color: event.target.value })
+    }
+  })
 
-colorPicker.addEventListener('input', (event) => {
-  const backgroundColor = event.target.value
+document
+  .getElementById('highlight-color')
+  .addEventListener('input', (event) => {
+    if (loaded) {
+      console.log('setHighlightColor')
+      client.do('setHighlightColor', { color: event.target.value })
+    }
+  })
+document.getElementById('render-modes').addEventListener('change', (event) => {
   if (loaded) {
-    client.do('setBackgroundColor', { color: backgroundColor })
+    client.do('setRenderMode', { mode: event.target.value })
+  }
+})
+document.getElementById('camera-modes').addEventListener('change', (event) => {
+  if (loaded) {
+    client.do('setCameraManipulationMode', { mode: event.target.value })
   }
 })
 

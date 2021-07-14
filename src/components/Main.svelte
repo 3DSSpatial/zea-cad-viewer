@@ -23,6 +23,7 @@
 
   import { createClient } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
+  import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
 
   const {
     Color,
@@ -68,16 +69,8 @@
 
   const loadZCADAsset = (url) => {
     const asset = new CADAsset()
-    // TODO: frame all can occur in the initial load
-    asset.getGeometryLibrary().once('loaded', () => {
-      renderer.frameAll()
-    })
     asset.load(url).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
+      renderer.frameAll()
     })
     $assets.addChild(asset)
     return asset
@@ -120,7 +113,7 @@
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
-    $scene.setupGrid(10, 10)
+    // $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
@@ -334,10 +327,28 @@
       client.on('setBackgroundColor', (data) => {
         const color = new Color(data.color)
         $scene.getSettings().getParameter('BackgroundColor').setValue(color)
+      })
 
-        if (data._id) {
-          client.send(data._id, { done: true })
-        }
+      client.on('setHighlightColor', (data) => {
+        const color = new Color(data.color)
+        // Note: the alpha value determines  the fill of the highlight.
+        color.a = 0.1
+        $selectionManager.selectionGroup
+          .getParameter('HighlightColor')
+          .setValue(color)
+        $selectionManager.selectionGroup
+          .getParameter('SubtreeHighlightColor')
+          .setValue(color)
+      })
+
+      client.on('setRenderMode', (data) => {
+        changeRenderMode(RENDER_MODES[data.mode])
+      })
+
+      client.on('setCameraManipulationMode', (data) => {
+        cameraManipulator.setDefaultManipulationMode(
+          CameraManipulator.MANIPULATION_MODES[data.mode]
+        )
       })
 
       client.on('loadCADFile', (data) => {
@@ -384,10 +395,10 @@
     /** EMBED MESSAGING END */
 
     /** DYNAMIC SELECTION UI START */
-    $selectionManager.on('leadSelectionChanged', (event) => {
-      parameterOwner = event.treeItem
-      $ui.shouldShowParameterOwnerWidget = parameterOwner
-    })
+    // $selectionManager.on('leadSelectionChanged', (event) => {
+    //   parameterOwner = event.treeItem
+    //   $ui.shouldShowParameterOwnerWidget = parameterOwner
+    // })
     /** DYNAMIC SELECTION UI END */
 
     APP_DATA.set(appData)
