@@ -1,14 +1,14 @@
-const buildTree = (treeItem) => {
-  const { TreeItem, AssetItem } = window.zeaEngine
+const { CADBody } = window.zeaCad
+const { TreeItem, InstanceItem } = window.zeaEngine
 
+const buildTree = (treeItem) => {
   const __c = (treeItem, json, depth) => {
     const children = treeItem.getChildren()
 
     for (const childItem of children) {
       if (childItem) {
         const childJson = __t(childItem, depth + 1)
-        if (childJson == false) continue
-
+        if (!childJson) continue
         if (!json.children) json.children = []
         json.children.push(childJson)
       }
@@ -16,19 +16,24 @@ const buildTree = (treeItem) => {
   }
 
   const __t = (treeItem, depth) => {
-    const name = treeItem.getName()
-    // filter out nodes at the leaves of the tree.
-    if (
-      name.startsWith('Mesh') ||
-      name.startsWith('Edge') ||
-      name.startsWith('TreeItem')
-    ) {
-      return false
-    }
     const json = {
-      name,
+      name: treeItem.getName(),
     }
-    if (treeItem instanceof TreeItem) __c(treeItem, json, depth)
+
+    const metaDataValues = ['Revision', 'Rev', 'InstanceName']
+    metaDataValues.forEach((name) => {
+      if (treeItem.hasParameter(name)) {
+        json[name] = treeItem.getParameter(name).getValue()
+      }
+    })
+
+    const isBody = treeItem instanceof CADBody
+    const isInstancedBody =
+      treeItem instanceof InstanceItem &&
+      treeItem.getSrcTree() instanceof CADBody
+    const hasChildren =
+      treeItem.getNumChildren() > 0 && !isBody && !isInstancedBody
+    if (hasChildren) __c(treeItem, json, depth)
     return json
   }
 
