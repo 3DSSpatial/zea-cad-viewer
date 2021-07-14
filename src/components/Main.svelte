@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
 
   import '../helpers/fps-display'
 
@@ -103,30 +104,6 @@
   }
   /** LOAD ASSETS METHODS END */
 
-  /* {{{ Zea Cloud Client. */
-  $: if ($zeaCloudClient) {
-    const organizationId = urlParams.get('organization-id')
-    const projectId = urlParams.get('project-id')
-    const fileId = urlParams.get('file-id')
-
-    $zeaCloudClient.findOrganization(organizationId).then((organization) => {
-      organization.findProject(projectId).then((project) => {
-        project.fetchLatestVersion().then(() => {
-          const file = project.getFileById(fileId)
-          const processName = 'cad'
-          const filename = 'output.zcad'
-          file
-            .getSignedUrlForReading(processName, filename)
-            .then((response) => {
-              let assetUrl = response.signedUrl
-              loadAsset(assetUrl, filename)
-            })
-        })
-      })
-    })
-  }
-  /* }}} Zea Cloud Client. */
-
   onMount(async () => {
     renderer = new GLRenderer(canvas)
 
@@ -143,7 +120,7 @@
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
-    // $scene.setupGrid(10, 10)
+    $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
@@ -320,6 +297,35 @@
       }
     }
     /** COLLAB END */
+
+    /* {{{ Zea Cloud Client. */
+    if (!embeddedMode) {
+      if (get(zeaCloudClient)) {
+        const organizationId = urlParams.get('organization-id')
+        const projectId = urlParams.get('project-id')
+        const fileId = urlParams.get('file-id')
+        if (organizationId && projectId && fileId) {
+          get(zeaCloudClient)
+            .findOrganization(organizationId)
+            .then((organization) => {
+              organization.findProject(projectId).then((project) => {
+                project.fetchLatestVersion().then(() => {
+                  const file = project.getFileById(fileId)
+                  const processName = 'cad'
+                  const filename = 'output.zcad'
+                  file
+                    .getSignedUrlForReading(processName, filename)
+                    .then((response) => {
+                      let assetUrl = response.signedUrl
+                      loadAsset(assetUrl, filename)
+                    })
+                })
+              })
+            })
+        }
+      }
+    }
+    /* }}} Zea Cloud Client. */
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
