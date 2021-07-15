@@ -6,7 +6,7 @@ The Embed view shows how the svelte app would be displayed within the context of
 
 # Getting Started
 
-To test zea-svelte-template embedded on your system, and run through the following steps.
+To test zea-cad-viewer embedded on your system, and run through the following steps.
 
 In the root of the project, run the svelete app as normal using dev.
 
@@ -33,17 +33,17 @@ Hit CTRL-C to stop the server
 
 Then open a browser at the given address.
 
-> http://192.168.2.25:8080/embed.html
+> http://192.168.2.25:8080/index.html
 
 # Embedders Guide
 
 Provided is a sample embed.html file that demonstrates how to embed Web Composer into a host application.
 
 ```javascript
-<iframe id="zea-svelte-template" src="./zea-svelte-template/index.html?noframe"></iframe>
+<iframe id="zea-cad-viewer" src="./zea-cad-viewer/index.html?embedded"></iframe>
 
 <script type="module">
-  const viewer = document.getElementById('zea-svelte-template')
+  const viewer = document.getElementById('zea-cad-viewer')
   import { ChannelMessenger } from './ChannelMessenger.js'
 
   const client = new ChannelMessenger(viewer)
@@ -161,11 +161,11 @@ The Svelte App might emit events based on interactions within the viewer or othe
 
 #### Ready
 
-The ready event is sent as soon as the zea-svelte-template frame has loaded, and the ChannelMessenger has established a connection with the page.
+The ready event is sent as soon as the zea-cad-viewer frame has loaded, and the ChannelMessenger has established a connection with the page.
 
 ```javascript
 client.on('ready', (data) => {
-  console.log('zea-svelte-template is ready to load data')
+  console.log('zea-cad-viewer is ready to load data')
 })
 ```
 
@@ -187,7 +187,7 @@ The commands are structured in the following way.
 
 > Payload: The payload is a json structure containing relevant information needed to process the command.
 
-> Results: Each command returns a promise that resolves to some result returned by the zea-svelte-template
+> Results: Each command returns a promise that resolves to some result returned by the zea-cad-viewer
 
 ```javascript
 do('command-name', payload).then((results) => {
