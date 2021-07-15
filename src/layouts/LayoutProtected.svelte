@@ -1,12 +1,27 @@
 <script>
-  import SplashScreen from '../components/SplashScreen.svelte'
+  import { redirect } from '@roxi/routify'
 
+  import SplashScreen from '../components/SplashScreen.svelte'
   import { authClient, currentUser } from '../stores/auth'
 
-  $: if ($authClient) {
-    $authClient.isAuthenticated().then((isAuthenticated) => {
+  const urlParams = new URLSearchParams(window.location.search)
+
+  const embeddedMode = urlParams.has('embedded')
+
+  if (embeddedMode) {
+    $redirect(`/?${urlParams.toString()}`)
+  } else {
+    authClient.subscribe(async (client) => {
+      // We need this check since `null` is
+      // the initial value for the `auth` store.
+      if (!client) {
+        return
+      }
+
+      const isAuthenticated = await client.isAuthenticated()
+
       if (!isAuthenticated) {
-        $authClient.loginWithRedirect({
+        client.loginWithRedirect({
           redirect_uri: `${window.location.origin}/sign-in-callback${window.location.search}`,
         })
       }
@@ -14,7 +29,9 @@
   }
 </script>
 
-{#if $authClient}
+{#if embeddedMode}
+  <slot />
+{:else if $authClient}
   {#if $currentUser}
     <slot />
   {/if}

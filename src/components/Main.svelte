@@ -104,25 +104,37 @@
   /** LOAD ASSETS METHODS END */
 
   /* {{{ Zea Cloud Client. */
-  $: if ($zeaCloudClient) {
-    const organizationId = urlParams.get('organization-id')
-    const projectId = urlParams.get('project-id')
-    const fileId = urlParams.get('file-id')
+  if (!embeddedMode) {
+    zeaCloudClient.subscribe(async (client) => {
+      // We need this check since `undefined` is
+      // the initial default value for derived stores.
+      // See:
+      // https://svelte.dev/docs#derived
+      if (!client) {
+        return
+      }
 
-    $zeaCloudClient.findOrganization(organizationId).then((organization) => {
-      organization.findProject(projectId).then((project) => {
-        project.fetchLatestVersion().then(() => {
-          const file = project.getFileById(fileId)
-          const processName = 'cad'
-          const filename = 'output.zcad'
-          file
-            .getSignedUrlForReading(processName, filename)
-            .then((response) => {
-              let assetUrl = response.signedUrl
-              loadAsset(assetUrl, filename)
-            })
-        })
-      })
+      const organizationId = urlParams.get('organization-id')
+      const projectId = urlParams.get('project-id')
+      const fileId = urlParams.get('file-id')
+
+      if (!organizationId || !projectId || !fileId) {
+        throw new Error(
+          'The Zea Cloud Client requires all of the `organization-id`, `project-id`, and `file-id` params.'
+        )
+      }
+
+      const organization = await client.findOrganization(organizationId)
+      const project = await organization.findProject(projectId)
+      await project.fetchLatestVersion()
+      const file = project.getFileById(fileId)
+      const processName = 'cad'
+      const filename = 'output.zcad'
+      const assetUrl = await file.getSignedUrlToReadDownstream(
+        processName,
+        filename
+      )
+      loadAsset(assetUrl, filename)
     })
   }
   /* }}} Zea Cloud Client. */
