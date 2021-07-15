@@ -11,7 +11,7 @@
     "@roxi/routify": "^2.15.1",
     "@tsconfig/svelte": "^1.0.0",
     "@zeainc/zea-cloud-sdk-web": "^1.0.0-0",
-    "auth0-spa-js": "^1.6.5",
+    "@auth0/auth0-spa-js": "^1.6.5",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.2",
     "cssnano": "^4.1.10",

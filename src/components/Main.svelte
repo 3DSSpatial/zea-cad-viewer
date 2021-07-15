@@ -97,6 +97,42 @@
   }
   /** LOAD ASSETS METHODS END */
 
+  /* {{{ Zea Cloud Client. */
+  if (!embeddedMode) {
+    zeaCloudClient.subscribe(async (client) => {
+      // We need this check since `undefined` is
+      // the initial default value for derived stores.
+      // See:
+      // https://svelte.dev/docs#derived
+      if (!client) {
+        return
+      }
+
+      const organizationId = urlParams.get('organization-id')
+      const projectId = urlParams.get('project-id')
+      const fileId = urlParams.get('file-id')
+
+      if (!organizationId || !projectId || !fileId) {
+        throw new Error(
+          'The Zea Cloud Client requires all of the `organization-id`, `project-id`, and `file-id` params.'
+        )
+      }
+
+      const organization = await client.findOrganization(organizationId)
+      const project = await organization.findProject(projectId)
+      await project.fetchLatestVersion()
+      const file = project.getFileById(fileId)
+      const processName = 'cad'
+      const filename = 'output.zcad'
+      const assetUrl = await file.getSignedUrlToReadDownstream(
+        processName,
+        filename
+      )
+      loadAsset(assetUrl, filename)
+    })
+  }
+  /* }}} Zea Cloud Client. */
+
   onMount(async () => {
     renderer = new GLRenderer(canvas)
 
@@ -113,7 +149,7 @@
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
-    // $scene.setupGrid(10, 10)
+    $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
@@ -290,35 +326,6 @@
       }
     }
     /** COLLAB END */
-
-    /* {{{ Zea Cloud Client. */
-    if (!embeddedMode) {
-      if (get(zeaCloudClient)) {
-        const organizationId = urlParams.get('organization-id')
-        const projectId = urlParams.get('project-id')
-        const fileId = urlParams.get('file-id')
-        if (organizationId && projectId && fileId) {
-          get(zeaCloudClient)
-            .findOrganization(organizationId)
-            .then((organization) => {
-              organization.findProject(projectId).then((project) => {
-                project.fetchLatestVersion().then(() => {
-                  const file = project.getFileById(fileId)
-                  const processName = 'cad'
-                  const filename = 'output.zcad'
-                  file
-                    .getSignedUrlForReading(processName, filename)
-                    .then((response) => {
-                      let assetUrl = response.signedUrl
-                      loadAsset(assetUrl, filename)
-                    })
-                })
-              })
-            })
-        }
-      }
-    }
-    /* }}} Zea Cloud Client. */
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
