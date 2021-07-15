@@ -388,9 +388,9 @@
     "@types/node" "*"
 
 "@zeainc/zea-cloud-sdk-web@^1.0.0-0":
-  version "1.0.0-3"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-cloud-sdk-web/-/zea-cloud-sdk-web-1.0.0-3.tgz#7e0a813852976517262f0c3ad47b3a3e09af51bb"
-  integrity sha512-JyGqXlEJaEWWM9nL+4zBpHZexr3u7aC8JmnT43cTIl3U0vmnn1ADXk6lguN+2exObIUamVZH5i5beUeduqPUWQ==
+  version "1.0.0-4"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-cloud-sdk-web/-/zea-cloud-sdk-web-1.0.0-4.tgz#0b47caf278c4f95843e15d0c716814046d2a3403"
+  integrity sha512-F8kcAuVOj2RyyQ37+XSCw+qrF9W0YqoDMkVINi8cxIPkwkgQzHJ3vkI/tGTdv3Ys61BCL3+jg6fEHYkvOnndcg==
   dependencies:
     debug "^4.3.1"
     events "^3.3.0"
