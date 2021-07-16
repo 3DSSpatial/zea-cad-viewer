@@ -7,7 +7,7 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
 
-    <title>Zea Composer Viewer - Embed</title>
+    <title>Zea CAD Viewer - Embed</title>
 
     <link rel="icon" type="image/png" href="./favicon-16x16.png" />
     <link
@@ -22,22 +22,43 @@
       <div class="flex flex-col space-y-2 w-80">
         <div class="flex flex-col space-y-2">
           <button
-            class="bg-yellow-300 rounded border-yellow-400 border shadow hover:bg-yellow-200 p-2"
+            class="
+              bg-yellow-300
+              rounded
+              border-yellow-400 border
+              shadow
+              hover:bg-yellow-200
+              p-2
+            "
             id="Gearbox"
           >
             Gearbox
           </button>
           <button
-            class="bg-yellow-300 rounded border-yellow-400 border shadow hover:bg-yellow-200 p-2"
-            id="Hospital_Structural"
+            class="
+              bg-yellow-300
+              rounded
+              border-yellow-400 border
+              shadow
+              hover:bg-yellow-200
+              p-2
+            "
+            id="Fidget-Spinner"
           >
-            Hospital_Structural
+            Fidget-Spinner
           </button>
           <button
-            class="bg-yellow-300 rounded border-yellow-400 border shadow hover:bg-yellow-200 p-2"
-            id="Hospital_HVAC"
+            class="
+              bg-yellow-300
+              rounded
+              border-yellow-400 border
+              shadow
+              hover:bg-yellow-200
+              p-2
+            "
+            id="HC_SRO4"
           >
-            Hospital_HVAC
+            Distance Measurer
           </button>
         </div>
         <div>
@@ -46,23 +67,55 @@
             <input type="color" id="background-color" value="#cccccc" />
           </label>
         </div>
+        <div>
+          <label class="flex items-center justify-center space-x-2">
+            <span>Highlight Color</span>
+            <input type="color" id="highlight-color" value="#F9CE03" />
+          </label>
+        </div>
+        <div>
+          <label
+            for="renderModes"
+            class="flex items-center justify-center space-x-2"
+          ></label>
+          <span>Render Mode:</span>
+          <select name="renderModes" id="render-modes">
+            <option value="WIREFRAME">Wireframe</option>
+            <option value="FLAT">Flat</option>
+            <option value="HIDDEN_LINE">Hidden Line</option>
+            <option value="SHADED">Shaded</option>
+            <option value="PBR" selected>PBR</option>
+          </select>
+        </div>
+        <div>
+          <label
+            for="cameraModes"
+            class="flex items-center justify-center space-x-2"
+          ></label>
+          <span>Camera Mode:</span>
+          <select name="cameraModes" id="camera-modes">
+            <option value="TURNTABLE">turntable</option>
+            <option value="TUMBLER" selected>tumbler</option>
+            <option value="TRACKBALL">trackball</option>
+          </select>
+        </div>
         <div class="bg-white flex-1 overflow-auto border rounded p-2">
           <pre class="h-full" id="output"></pre>
         </div>
       </div>
       <div class="flex-1">
-        <iframe
-          class="border-2 border-gray-300 rounded h-full w-full"
-          id="zea-svelte-app"
-          src="http://localhost:5000/?embedded"
-        ></iframe>
         <!-- For local development
         <iframe
           class="border-2 border-gray-300 rounded h-full w-full"
           id="zea-svelte-app"
-          src="https://svelte-template.zea.live/?embedded"
+          src="https://d667e43e.cad-viewer-staging.pages.dev/?embedded"
         ></iframe>
-        -->
+      -->
+        <iframe
+          class="border-2 border-gray-300 rounded h-full w-full"
+          id="zea-svelte-app"
+          src="https://cad-viewer-staging.zea.live/?embedded"
+        ></iframe>
       </div>
     </div>
   </body>

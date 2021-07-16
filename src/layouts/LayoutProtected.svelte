@@ -3,7 +3,6 @@
 
   import SplashScreen from '../components/SplashScreen.svelte'
   import { authClient, currentUser } from '../stores/auth'
-
   const urlParams = new URLSearchParams(window.location.search)
 
   const embeddedMode = urlParams.has('embedded')

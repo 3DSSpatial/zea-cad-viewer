@@ -1,231 +1,240 @@
-# Zea Svelte Template
+# Zea CAD Viewer
 
-## Features
+The zea-cad-viewer is an embeddable web application for viewing CAD data. It is intended to be integrated into host applications that might need to support displaying 3D cad data in the browser.
 
-- Built on top of [Svelte](https://svelte.dev/), a radical new approach to building user interfaces.
-- Includes the latest stable versions of the Zea tools: [Zea Engine](https://docs.zea.live/zea-engine/), [Zea UI](https://web-components.zea.live/), [Zea UX](https://docs.zea.live/zea-ux/), and [Zea Collab](https://docs.zea.live/zea-collab/).
+# Processing CAD files using the zea-cloud API.
+
+TODO:
+
+# Embedding the Zea CAD Viewer in your own Web App
 
 ## Live Demo
 
-This template has been deployed as a live demo for you to check out now.
+The Embed view shows how the zea-cad-viewer would be displayed within the context of another application, embedded as an iFrame. The host application can then control the embedded zea-cad-viewer via the JSON API and the Channel Messenger classes.
 
-> Password: zea
+-![FidgetSpinner](docs/images/FidgetSpinner.png)
 
-You can change the password in your own deployments, or connect to an authentication service.
-See below.
+> https://docs.zea.live/zea-cad-viewer/embed.html
 
-https://svelte-template.zea.live/
+# Getting Started
 
-The default asset provided is the GearBox.
-![GearBox](docs/images/GearBox.jpg)
+To test zea-cad-viewer embedded on your system, and follow the following steps.
 
-You can also modify the app to load parts of the hospital.
-![Hosptial-Structural](docs/images/Hosptial-Structural.jpg)
+# Add the iframe tag.
 
-https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_Structural.zcad
-
-https://svelte-template.zea.live/?zcad=/data/Hospital/Autodesk_Hospital_HVAC.zcad
-
-## Prerequisites
-
-To get this template working, you're going to need [Node.js](https://nodejs.org/en/download/) (preferably the latest LTS version).
-
-## Getting Started
-
-Our recommended way to clone this template is by using [degit](https://github.com/Rich-Harris/degit), a project scaffolding tool.
-
-1. Run this command on your terminal:
-
-```bash
-npx degit zeainc/zea-svelte-template#main my-awesome-app
-```
-
-2. The above command will create the `my-awesome-app` directory for you. Go into it:
-
-```bash
-cd my-awesome-app
-```
-
-3. Install the project's dependencies by running:
-
-```bash
-npm install
-```
-
-4. Start a development server by running:
-
-```bash
-npm run dev
-```
-
-5. Use your browser to go to: http://localhost:5000/
-
-6. Build something awesome.
-
-### npm scripts
-
-| Syntax  | Description                                      |
-| ------- | ------------------------------------------------ |
-| `build` | Build app with pre-rendering and dynamic imports |
-| `dev`   | Development (port 5000)                          |
-| `serve` | Run after a build to preview. Serves SPA on 5000 |
-
-# Features
-
-## UI
-
-The template app provides a library of Svelte components that can be customized and used to build your own user interfaces.
-
-- Drawer: a Side panel that pops out to display additional content.
-- Dialog: Used to show modal content.
-- Tabs: A simple tabs layout component.
-- UserChip: Displays the current user avatar.
-- UserChips: Displays the chips for all the users in the current session.
-- ParameterOwnerWidget: A Dynamic UI for displaying Parameters.
-
-## UX
-
-The template leverages the Zea UX library to provide Undo, Redo and tools such as selection manager, transform tools.
-
-> https://docs.zea.live/zea-ux
-
-## User Identification and Authentication
-
-This template app comes with a simple user identification and authentication system. Users enter their name and an optional password to gain access to the app.
-
-```javascript
-onMount(async () => {
-  const isAuthenticated = await auth.isAuthenticated()
-  if (!isAuthenticated) {
-    $redirect('/login')
-  }
-})
-```
-
-The Authentication can be disabled by commenting out the $redirect('/login') line in the index.svelte file.
-
-> Note: the 'auth.js' file is designed to support integrating other authentication systems provided by frameworks such as Firebase or Auth0.
-
-## Collaboration
-
-If a user is identified, then the app integrates the powerful collaboration framework refrred to as 'Collab.
-
-> https://docs.zea.live/zea-collab/
-
-```javascript
-const SOCKET_URL = 'https://websocket-staging.zea.live'
-const ROOM_ID = 'zea-template-collab'
-```
-
-> Note: the ROOM_ID is what defines whether users of a given app are visible to each other. Always customize this value to avoid collisions with other apps.
-
-```javascript
-const session = new Session(userData, SOCKET_URL)
-session.joinRoom(ROOM_ID)
-const sessionSync = new SessionSync(session, appData, userData, {})
-```
-
-## CAD
-
-the Zea CAD library comes pre-integrated and a sample zcad file is loaded.
-
-> https://docs.zea.live/zea-cad/
-
-```javascript
-const asset = new CADAsset()
-asset.on('loaded', () => {
-  renderer.frameAll()
-})
-scene.getRoot().addChild(asset)
-asset.getParameter('FilePath').setValue('/data/HC_SRO4.zcad')
-```
-
-The code above loads the sample cad file.
-
-# Installing your own plugins
-
-If you have developed a plugin using the zea-plugin-template, and you wish to install it into the zea svelte template you have a couple of options.
-
-1. Copy the built plugin file into the svelte template assets folder.
-   - ./assets
-2. Create a symlink between your plugin/dist folder and a the assets folder so you can keep iterating on the plugin.
-   e.g. on Windows.
-
-```cmd
-(Windows Command script)
-mklink /J "assets/my-plugin " "path/to/my-plugin/dist"
-```
-
-3. Publish your plugin to npm.
-
-- Use on of the package servers, such as unpkg, or jsdeliver to access your plugin
-- install your plugin into the svelte app using npm install, and then copy the plugin into the build folder using the [rollup-plugin-copy](https://www.npmjs.com/package/rollup-plugin-copy)
-
-Then add a script tag to the \_\_app.html file to load your plugin.
+Add an iframe tag to your application, and specify the URL of the viewer.
 
 ```html
-<script crossorigin src="my-plugin/index.umd.js"></script>
+<iframe
+  id="zea-cad-viewer"
+  src="https://cad-viewer-staging.zea.live/?embedded"
+></iframe>
 ```
 
-# Script tags instead of esm imports
+# Connect the Channel Messenger.
 
-Currently the engine and its plugins can only be imported using UMD script tags.
+Using JavaScript, import the ChannelMessenger and construct an instance passing the iframe tag.
 
-> Why don't we use esm imports to load the engine and its plugins?
+```html
+<script type="module">
+  import { ChannelMessenger } from 'https://docs.zea.live/zea-cad-viewer/ChannelMessenger.js'
 
-Yes we would like to do that eventually, but there are a few issues holding us back.
+  const viewer = document.getElementById('zea-cad-viewer')
 
-1. Bundlers like webpack and rollup have a terrible time at understanding diamond shaped dependency trees. I will explain by example. Package B depends on package A and package C depends on both package A and B. If we import B and C, A should be imported. however, if in the package.json of B or C, the version dependency is even slightly different, even with valid version rules that should mean both B and C should be compatible with the same version of A, we find that the bundler will often try to load multiple different versions of A. e.g. A version 2.3.1, and A version 2.3.0. When A is our engine, this causes all sorts of obscure problems. For now, until we can guarantee that the bundler will load exactly one copy of our engine, we have to stick with script tags.
+  const client = new ChannelMessenger(viewer)
+  client.on('ready', (data) => {
+    logger.log('Ready')
+  })
+</script>
+```
 
-2. Bundlers and WASM don't mix. We leverage WASM in our engine, and WASM requires a fetch of the WASM file which is included in our package. Currently the bundlers are unable to include the WASM file and so we have to fallback to fetching the WASM file from some predefined location, instead of the package location in your node_modules folder. Not ideal, but we hope this issue to be resolved soon as WASM imports are included in the spec.
+The ChannelMessenger establishes a connection to the viewer, which allows the host application to send commands to the viewer, and receive events and data back from the viewer.
 
-We hope that these issues are resolved over time. If you have any suggestions on alternative methods to what we have presented, please feel free to reach out and let us know your thoughts.
+## Commands
 
-# Deploying
+The ChannelMessenger enables a host application to send arbitrary commands to the embed window and receive data in response.
 
-Varcel is a great platform for quickly deploying SPAs (Single Page Applications) without needing to setup your own infrastructure.
+### events vs send & get commands
 
-In a few clicks you can connected Varcel to your GitHub repository, at which point Varcel will update your published web app on every push to your main branch.
+Commands fall into 3 categories, 'event', 'send' and 'get'.
 
-https://vercel.com/
+#### Events
 
-1. The first step is to sign up to Varcel using your GitHub account, or whatever Git platform you can use.
-   ![Step1](docs/images/Varcel-Step1.png)
+Events are receive data from the embed page and are used to push data from the embed to the host. This could include telling the host that the used has clicked on a specific geometry.
 
-2. Connect Varcel to the github repo containing the app built using this template
-   ![Step2](docs/images/Varcel-Step2.png)
+To implement an event, when the event must be related to the host, simply send the event over the channel messenger.
 
-3. ![Step3](docs/images/Varcel-Step3.png)
+##### In the Svelte App code
 
-4. ![Step4](docs/images/Varcel-Step4.png)
+```javascript
+  // After 20 seconds, we tell the user something..
+  setTimout(() => {
+    client.send('gameOver', { info: ... })
+  }, 20000)
+```
 
-5. ![Step5](docs/images/Varcel-Step5.png)
+##### In the Host App code
 
-6. ![Step6](docs/images/Varcel-Step6.png)
+In your host application, you listen for this event using the channel messenger. You can then handle the event how you wish.
 
-# Embedding
+```javascript
+client.on('somethingChanged', (data) => {
+  console.log('selectionChanged:', data)
+})
+```
 
-The Svelte App id designed to support embedding in other web applications. For more information on embedding the svelte app in your own application consult the Embed guide.
+Within the zea-cad-viewer code, you can add support for your own commands by adding handlers for various command names.
 
-Embed Guide: https://github.com/ZeaInc/zea-svelte-template/blob/main/docs/README-EMBEDDING.md
+#### Send Commamds
 
-## Issues?
+Used to send a command from the host page to the embed page, but a response is not expected.
 
-File it on Github: https://github.com/ZeaInc/zea-svelte-template
+##### In the Svelte App code
 
-Start a discussion: https://community.zea.live/
+So implement a 'send' command, simply add code to the zea-cad-viewer that listens for your specific message, and implement some logic.
 
-# Credits
+```javascript
+  client.on('changeSomething', (data) => {
+    // The host wants us to change something. Lets do it.
+    ....
+    // Return a simple 'done' value to let the host know that it completed.
+    if (data._id) {
+      client.send(data._id, { done: true })
+    }
+  })
+```
 
-This Svelte Template is a preconfigured Svelte app that combines the engine and many of the popular plugins.  
-This template contains the following software from Zea Inc. Please be mindful of the license attached to each of these software if publishing or redistributing your work.
+##### In the Host App code
 
-**Zea Engine**: https://github.com/ZeaInc/zea-engine
+Then in your host application, you can now invoke the command using the channel messenger.
 
-**Zea CAD**: Proprietary, closed-source
+```javascript
+client.do('changeSomething', { arg: 'Important Info' })
+```
 
-**Zea Collab**: https://github.com/ZeaInc/zea-collab
+The zea-cad-viewer will receive the message and apply the requested changes.
 
-**Zea Kinematics**: https://github.com/ZeaInc/zea-kinematics
+# JSON API
 
-**Zea UX**: https://github.com/ZeaInc/zea-ux
+The zea-cad-viewer accepts a range of commands sent via the ChannelMessenger interface. These commands represent a sample set of commands for you to check out and use to base your own commands.
+
+## Events
+
+The Svelte App might emit events based on interactions within the viewer or other reasons. The host web application can listen to these events and respond.
+
+#### Ready
+
+The ready event is sent as soon as the zea-cad-viewer frame has loaded, and the ChannelMessenger has established a connection with the page.
+
+```javascript
+client.on('ready', (data) => {
+  console.log('zea-cad-viewer is ready to load data')
+})
+```
+
+#### selectionChanged
+
+The selectionChanged event is sent when the selection changes in the selection manager in the app.
+
+```javascript
+client.on('selectionChanged', (data) => {
+  console.log('selectionChanged:', data)
+})
+```
+
+## Commands
+
+The commands are structured in the following way.
+
+> Command Name: The command name is a string describing which command should be invoked in the viewer.
+> Payload: The payload is a json structure containing relevant information needed to process the command.
+> Results: Each command returns a promise that resolves to some result returned by the zea-cad-viewer
+
+```javascript
+do('command-name', payload).then((results) => {
+  // process or display the results.
+})
+```
+
+#### Load Data
+
+```javascript
+client
+  .do('loadCADFile', {
+    url: '../foo.zcad',
+    addToCurrentScene: false,
+  })
+  .then((data) => {
+    console.log('loadCADFile Loaded', data)
+  })
+```
+
+##### Payload:
+
+zcad: the URL of the zcad accessible to the app.
+addToCurrentScene: If set to true, adds the new file to the scene containing the existing file. Else the scene is cleared and the new file is loaded.
+convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the model to correctly orient the data according to the viewer axis system.
+
+##### Results:
+
+The command returns a JavaScript object containing high level data about the loaded project.
+
+#### Get Model Structure
+
+Retrieves the model structure of the loaded data.
+
+```javascript
+client.do('getModelStructure', {}).then((data) => {
+  console.log('model structure:', data)
+})
+```
+
+##### Results:
+
+The command returns a JavaScript object containing high level data about the loaded project.
+
+#### Set Background Color
+
+Sets the background color of the viewport.
+
+```javascript
+client.do('setBackgroundColor', { color: '#FF0000' })
+```
+
+#### Set Highlight Color
+
+Sets the color used to provide silhouette borders around selected objects.
+
+```javascript
+client.do('setHighlightColor', { color: '#FF0000' })
+```
+
+#### Set Render Mode
+
+Sets the render mode currently used by the renderer.
+
+Possible Values are:
+
+- "WIREFRAME"
+- "FLAT"
+- "HIDDEN_LINE"
+- "SHADED"
+- "PBR"(default)
+
+```javascript
+client.do('setRenderMode', { mode: 'FLAT' })
+```
+
+#### Set Camera Manipulation Mode
+
+Sets the method used to manipulate the view.
+
+Possible Values are:
+
+- "TURNTABLE": Better for scenes where the user should always be vertical in the scene. e.g. architectural scenes, or large CAD models.
+- "TUMBLER"(default): Better for scenes were the user wants to look at the data from any point of view, including upside down, and the 'up' direction isn't important to the user.
+- "TRACKBALL" Better for scenes were the user wants to look at the data from any point of view, including upside down, and the 'up' direction isn't important to the user.
+
+```javascript
+client.do('setCameraManipulationMode', { mode: 'TURNTABLE' })
+```
