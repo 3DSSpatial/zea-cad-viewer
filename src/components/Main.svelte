@@ -149,7 +149,7 @@
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
-    $scene.setupGrid(10, 10)
+    // $scene.setupGrid(10, 10)
     $scene
       .getSettings()
       .getParameter('BackgroundColor')
