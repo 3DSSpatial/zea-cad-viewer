@@ -14,25 +14,25 @@ client.on('ready', (data) => {
 const setupLoadBtn = (name, url) => {
   const btn = document.getElementById(name)
   if (!btn) return
+
+  const base = document.location.href.substring(
+    0,
+    document.location.href.lastIndexOf('/')
+  )
   btn.addEventListener('click', () => {
     client
       .do('loadCADFile', {
-        url,
+        url: base + url,
       })
       .then((data) => {
         logger.logJson('modelStructure', data)
       })
   })
 }
-setupLoadBtn(
-  'Gearbox',
-  document.location.origin + `/data/gear_box_final_asm.zcad`
-)
-setupLoadBtn(
-  'Fidget-Spinner',
-  document.location.origin + '/data/Fidget-Spinner-2.zcad'
-)
-setupLoadBtn('HC_SRO4', document.location.origin + '/data/HC_SRO4.zcad')
+
+setupLoadBtn('Gearbox', `/data/gear_box_final_asm.zcad`)
+setupLoadBtn('Fidget-Spinner', '/data/Fidget-Spinner-2.zcad')
+setupLoadBtn('HC_SRO4', '/data/HC_SRO4.zcad')
 
 /* Background color */
 document
