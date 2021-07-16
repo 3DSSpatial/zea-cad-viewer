@@ -195,12 +195,13 @@ do('command-name', payload).then((results) => {
 })
 ```
 
-#### Load Project
+#### Load Data
 
 ```javascript
 client
   .do('loadCADFile', {
     url: '../foo.zcad',
+    addToCurrentScene: false,
   })
   .then((data) => {
     console.log('loadCADFile Loaded', data)
@@ -210,6 +211,8 @@ client
 ##### Payload:
 
 zcad: the URL of the zcad accessible to the app.
+addToCurrentScene: If set to true, adds the new file to the scene containing the existing file. Else the scene is cleared and the new file is loaded.
+convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the model to correctly orient the data according to the viewer axis system.
 
 ##### Results:
 

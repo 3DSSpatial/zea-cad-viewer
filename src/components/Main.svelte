@@ -362,19 +362,30 @@
       })
 
       client.on('setCameraManipulationMode', (data) => {
+        const mode = data.mode.toLowerCase()
         cameraManipulator.setDefaultManipulationMode(
-          CameraManipulator.MANIPULATION_MODES[data.mode]
+          CameraManipulator.MANIPULATION_MODES[mode]
         )
       })
 
       client.on('loadCADFile', (data) => {
         console.log('loadCADFile', data)
-        if (!data.keep) {
+        if (!data.addToCurrentScene) {
           $assets.removeAllChildren()
         }
 
         const asset = loadAsset(data.url)
         asset.once('loaded', () => {
+          if (!data.convertZtoY) {
+            // Rotate the model so 'up' is the correct direction
+            const xfo = asset.getParameter('LocalXfo').getValue()
+            xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+
+            // const box = asset.getParameter('BoundingBox').getValue()
+            // xfo.tr.z = -box.p0.z
+            asset.getParameter('LocalXfo').setValue(xfo)
+          }
+
           if (data._id) {
             const tree = buildTree(asset)
             client.send(data._id, { modelStructure: tree })
