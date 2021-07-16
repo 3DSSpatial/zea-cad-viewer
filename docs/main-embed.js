@@ -13,6 +13,7 @@ client.on('ready', (data) => {
 
 const setupLoadBtn = (name, url) => {
   const btn = document.getElementById(name)
+  if (!btn) return
   btn.addEventListener('click', () => {
     client
       .do('loadCADFile', {
@@ -29,7 +30,7 @@ setupLoadBtn(
 )
 setupLoadBtn(
   'Fidget-Spinner',
-  document.location.origin + '/dataFidget-Spinner-2.zcad'
+  document.location.origin + '/data/Fidget-Spinner-2.zcad'
 )
 setupLoadBtn('HC_SRO4', document.location.origin + '/data/HC_SRO4.zcad')
 

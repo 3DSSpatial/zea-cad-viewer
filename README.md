@@ -12,7 +12,7 @@ TODO:
 
 The Embed view shows how the zea-cad-viewer would be displayed within the context of another application, embedded as an iFrame. The host application can then control the embedded zea-cad-viewer via the JSON API and the Channel Messenger classes.
 
--![GearBox](docs/images/GearBox.jpg)
+-![FidgetSpinner](docs/images/FidgetSpinner.png)
 
 > https://docs.zea.live/zea-cad-viewer/embed.html
 
