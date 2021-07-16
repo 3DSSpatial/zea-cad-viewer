@@ -302,6 +302,15 @@
     fpsContainer.appendChild(fpsDisplay)
     /** FPS DISPLAY END */
 
+    /** LOAD ASSETS START */
+    if (embeddedMode) {
+      if (urlParams.has('zcad')) {
+        const assetUrl = urlParams.get('zcad')
+        loadAsset(assetUrl, assetUrl)
+      }
+    }
+    /** LOAD ASSETS END */
+
     /** COLLAB START /
     if (!embeddedMode) {
       const userData = await auth.getUserData()
