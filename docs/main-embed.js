@@ -28,13 +28,10 @@ setupLoadBtn(
   document.location.origin + `/data/gear_box_final_asm.zcad`
 )
 setupLoadBtn(
-  'Hospital_Structural',
-  document.location.origin + '/data/Hospital/Autodesk_Hospital_Structural.zcad'
+  'Fidget-Spinner',
+  document.location.origin + '/dataFidget-Spinner-2.zcad'
 )
-setupLoadBtn(
-  'Hospital_HVAC',
-  document.location.origin + '/data/Hospital/Autodesk_Hospital_HVAC.zcad'
-)
+setupLoadBtn('HC_SRO4', document.location.origin + '/data/HC_SRO4.zcad')
 
 /* Background color */
 document
@@ -49,7 +46,6 @@ document
   .getElementById('highlight-color')
   .addEventListener('input', (event) => {
     if (loaded) {
-      console.log('setHighlightColor')
       client.do('setHighlightColor', { color: event.target.value })
     }
   })
