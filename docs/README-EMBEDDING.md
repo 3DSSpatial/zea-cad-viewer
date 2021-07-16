@@ -227,3 +227,16 @@ Sets the background color of the viewport.
 ```javascript
 client.do('setBackgroundColor', { color: '#FF0000' })
 ```
+#### Set Camera Manipulation Mode
+
+Sets the method used to manipulate the view.
+
+Possible Values are:
+
+- "TURNTABLE": Better for scenes where the user should always be vertical in the scene. e.g. architectural scenes, or large CAD models.
+- "TUMBLER"(default): Better for scenes were the user wants to look at the data from any point of view, including upside down, and the 'up' direction isn't important to the user.
+- "TRACKBALL" Better for scenes were the user wants to look at the data from any point of view, including upside down, and the 'up' direction isn't important to the user.
+
+```javascript
+client.do('setCameraManipulationMode', { mode: 'TURNTABLE' })
+```
