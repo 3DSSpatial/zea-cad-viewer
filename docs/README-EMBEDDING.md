@@ -218,15 +218,52 @@ convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the
 
 The command returns a JavaScript object containing high level data about the loaded project.
 
+#### Get Model Structure
+
+Retrieves the model structure of the loaded data.
+
+```javascript
+client.do('getModelStructure', {}).then((data) => {
+  console.log('model structure:', data)
+})
+```
+
+##### Results:
+
+The command returns a JavaScript object containing high level data about the loaded project.
+
 #### Set Background Color
 
 Sets the background color of the viewport.
 
-> Note: this command is given to provide an example of how the viewer can be controlled. Other commands might be more relevant, and we are looking for this feedback.
-
 ```javascript
 client.do('setBackgroundColor', { color: '#FF0000' })
 ```
+
+#### Set Highlight Color
+
+Sets the color used to provide silhouette borders around selected objects.
+
+```javascript
+client.do('setHighlightColor', { color: '#FF0000' })
+```
+
+#### Set Render Mode
+
+Sets the render mode currently used by the renderer.
+
+Possible Values are:
+
+- "WIREFRAME"
+- "FLAT"
+- "HIDDEN_LINE"
+- "SHADED"
+- "PBR"(default)
+
+```javascript
+client.do('setRenderMode', { mode: 'FLAT' })
+```
+
 #### Set Camera Manipulation Mode
 
 Sets the method used to manipulate the view.
