@@ -1,6 +1,4 @@
 export class Logger {
-  output
-
   constructor(selector) {
     this.output = document.getElementById('output')
   }
@@ -8,10 +6,14 @@ export class Logger {
     this.log(key + ':' + JSON.stringify(jsonMessage, null, 2))
   }
   log(message) {
-    output.textContent = message
+    if (this.output) {
+      this.output.textContent = message
+    }
   }
 
   clear() {
-    output.textContent = ''
+    if (this.output) {
+      this.output.textContent = ''
+    }
   }
 }
