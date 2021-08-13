@@ -24,6 +24,7 @@
   import { createClient } from '../ChannelMessenger.js'
   import buildTree from '../helpers/buildTree'
   import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
+  import { setupMeasurementTools } from '../helpers/measureTools'
 
   const {
     Color,
@@ -195,6 +196,8 @@
     renderer.getViewport().setManipulator(toolManager)
     toolManager.pushTool('CameraManipulator')
     appData.toolManager = toolManager
+
+    setupMeasurementTools(toolManager, appData)
 
     // Note: the alpha value determines  the fill of the highlight.
     const selectionColor = new Color('#F9CE03')
