@@ -24,42 +24,16 @@ var ID = function () {
 
 class ChannelMessenger {
   constructor(viewer) {
-    console.log('client Side ChannelMessenger')
+    console.log('host window ChannelMessenger')
     this.listeners = {}
     this.resolves = {}
 
     const channel = new MessageChannel()
     this.port1 = channel.port1
 
-    // Wait for the viewer to load
-    let id
-    viewer.addEventListener('load', () => {
-      console.log('viewer loaded')
-      // Note: without this timeout, the Svelte app
-      // has not initialized its ChannelMessenger by the time
-      // we send the init message. We keep sending messages until the
-      // iframe responds
-      id = setInterval(() => {
-        // Transfer port2 to the viewer
-        try {
-          viewer.contentWindow.postMessage('init', '*', [channel.port2])
-        } catch (err) {
-          const str = '' + err
-          if (
-            !str.startsWith(
-              "DataCloneError: Failed to execute 'postMessage' on 'Window': Port at index 0 is already neutered."
-            )
-          ) {
-            console.log(str)
-          }
-        }
-      }, 50)
-    })
-
     // Listen for messages on port1
     this.port1.onmessage = (e) => {
       if (e.data == 'ready') {
-        clearInterval(id)
         this.emit('ready')
       } else {
         if (Array.isArray(e.data) && e.data.length == 2) {
@@ -78,6 +52,34 @@ class ChannelMessenger {
         }
       }
     }
+
+    // Wait for the viewer to load
+    let id
+    const handleIFrameLoad = () => {
+      viewer.contentWindow.postMessage('ping', '*')
+      // Note: The iframe ChannelMessenger might not be setup yet,
+      // so we start blasting messages as the iframe until we get a
+      // ping back. Then we transfer the port.
+      id = setInterval(() => {
+        viewer.contentWindow.postMessage('ping', '*')
+      }, 50)
+    }
+    viewer.addEventListener('load', handleIFrameLoad)
+    // We listen for a response from the iframe
+    const handleIFrameMessage = (event) => {
+      if (event.data == 'ping') {
+        if (id) {
+          // Its awake. Stop blasting messages at the iframe.
+          clearInterval(id)
+          id = 0
+          // Transfer port2 to the viewer. We will use the port from now on...
+          viewer.contentWindow.postMessage('initPort', '*', [channel.port2])
+          viewer.removeEventListener('load', handleIFrameLoad)
+          window.removeEventListener('message', handleIFrameMessage)
+        }
+      }
+    }
+    window.addEventListener('message', handleIFrameMessage)
   }
 
   do(msg, payload = {}, timeout = 5000) {

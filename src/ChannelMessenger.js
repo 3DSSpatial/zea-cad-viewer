@@ -4,18 +4,28 @@ const createClient = () => {
   class ChannelMessenger extends EventEmitter {
     constructor() {
       super()
-      console.log('server Side ChannelMessenger')
+      console.log('iframe ChannelMessenger')
 
+      let pingBack = false
+      let portInitialized = false
       // Listen for the initial port transfer message
-      window.addEventListener('message', (e) => {
-        console.log('=====initPort=========')
-        // Setup the transferred port
-        this.port2 = e.ports[0]
-        if (!this.port2) {
-          return
+      window.addEventListener('message', (event) => {
+        if (event.data == 'ping') {
+          if (!pingBack && !portInitialized) {
+            pingBack = true
+            event.source.postMessage('ping', '*')
+          }
+        } else if (event.data == 'initPort') {
+          console.log('=====initPort=========')
+          portInitialized = true
+          // Setup the transferred port
+          this.port2 = event.ports[0]
+          if (!this.port2) {
+            return
+          }
+          this.port2.onmessage = onMessage
+          this.port2.postMessage('ready')
         }
-        this.port2.onmessage = onMessage
-        this.port2.postMessage('ready')
       })
 
       // Handle messages received on port2
