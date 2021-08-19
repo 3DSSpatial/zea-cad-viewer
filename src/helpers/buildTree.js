@@ -1,4 +1,4 @@
-const { CADBody } = window.zeaCad
+const { CADBody, CADPart } = window.zeaCad
 const { TreeItem, InstanceItem } = window.zeaEngine
 
 const buildTree = (treeItem) => {
@@ -26,6 +26,11 @@ const buildTree = (treeItem) => {
         json[name] = treeItem.getParameter(name).getValue()
       }
     })
+
+    // Skip all the bodies and surfaces.
+    if (treeItem instanceof CADPart) {
+      return json
+    }
 
     const isBody = treeItem instanceof CADBody
     const isInstancedBody =

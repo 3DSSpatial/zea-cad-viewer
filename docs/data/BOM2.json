@@ -242,13 +242,13 @@
   {
     "PartNumber": "2036",
     "PartName": "Wheel",
-    "Revision": 1,
+    "Revision": 3,
     "Description": "Wheel",
     "Quantity": 2,
     "Cost": "$20.45",
     "Path": {
       "file": "2036.sldprt",
-      "url": "/SolidworksTrailor/2036.sldprt.zcad"
+      "url": "/SolidworksTrailor/STOCK_WHEEL_DMAX.SLDPRT.zcad"
     }
   },
   {

@@ -4,6 +4,7 @@ const createClient = () => {
   class ChannelMessenger extends EventEmitter {
     constructor() {
       super()
+      console.log('server Side ChannelMessenger')
 
       // Listen for the initial port transfer message
       window.addEventListener('message', (e) => {

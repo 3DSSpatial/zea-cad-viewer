@@ -83,7 +83,8 @@ function resizableGrid(table) {
 }
 
 class BOM {
-  constructor(table, bomURL) {
+  constructor(table) {
+    this.table = table
     // //////////////////////////////////////////
     // BOM Display
 
@@ -91,51 +92,76 @@ class BOM {
     this.partMapping = {}
     this.parts = []
     this.parts = []
-    // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
-    const addRow = (rowData) => {
-      const row = table.insertRow(-1)
-      // Add some text to the new cells:
-      const cb = document.createElement('input')
-      cb.type = 'checkbox'
-      // cb.appendChild(document.createTextNode(cap))
-      row.insertCell(0).appendChild(cb)
-      let cellindex = 1
-      for (let key in rowData) {
-        const cell = row.insertCell(cellindex)
-        cell.innerHTML = rowData[key]
-        cellindex++
-      }
-
-      row.addEventListener('mousedown', (e) => {
-        if (!this.parts[index].hilighted) {
-          row.classList.add('row_highlight')
-          this.parts[index].hilighted = true
-          this.emit('rowSelected', { PartNumber: rowData['PartNumber'] })
-        } else {
-          row.classList.remove('row_highlight')
-          this.parts[index].hilighted = false
-          this.emit('rowDeselected', { PartNumber: rowData['PartNumber'] })
-        }
-      })
-
-      const index = this.parts.length
-      this.partMapping[rowData['PartNumber']] = index
-      this.parts.push({
-        row,
-        hilighted: false,
-      })
-    }
-    // addRow(['1234', 'Screw12', 'Brass 12inch Screw', 12, '$0.1'])
-
-    fetch(bomURL)
-      .then((response) => response.json())
-      .then((rows) => {
-        rows.forEach(addRow)
-      })
 
     resizableGrid(table)
 
     this.listeners = {}
+  }
+
+  // addRow(['1234', 'Screw12', 'Brass 12inch Screw', 12, '$0.1'])
+  load(bomURL) {
+    console.log('Loading BOM:', bomURL)
+    return new Promise((resolve, reject) => {
+      fetch(bomURL)
+        .then((response) => response.json())
+        .then((rows) => {
+          // Now we simulate a chackout process in a PLM software.
+          // Typically this would involve copying the CAD files for each part
+          // in the BOM into some target folder so that the when the assemblies
+          // are loaded they can resolve these cad files.
+          // In this example, we instead provide a resolution mapping that
+          // tells the viewer how to find each cad file.
+          const resources = {}
+
+          const base = bomURL.substring(0, bomURL.lastIndexOf('/'))
+
+          rows.forEach((row) => {
+            if (row.Path) {
+              // When the viewer looks for a file, provide where it can find it.
+              // You can provide a mapping to any file here.
+              resources[row.Path.file] = base + row.Path.url
+              delete row.Path
+            }
+            this.addRow(row)
+          })
+          resolve(resources)
+        })
+    })
+  }
+
+  // Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+  addRow(rowData) {
+    const row = this.table.insertRow(-1)
+    // Add some text to the new cells:
+    const cb = document.createElement('input')
+    cb.type = 'checkbox'
+    // cb.appendChild(document.createTextNode(cap))
+    row.insertCell(0).appendChild(cb)
+    let cellindex = 1
+    for (let key in rowData) {
+      const cell = row.insertCell(cellindex)
+      cell.innerHTML = rowData[key]
+      cellindex++
+    }
+
+    row.addEventListener('mousedown', (e) => {
+      if (!this.parts[index].hilighted) {
+        row.classList.add('row_highlight')
+        this.parts[index].hilighted = true
+        this.emit('rowSelected', { PartNumber: rowData['PartNumber'] })
+      } else {
+        row.classList.remove('row_highlight')
+        this.parts[index].hilighted = false
+        this.emit('rowDeselected', { PartNumber: rowData['PartNumber'] })
+      }
+    })
+
+    const index = this.parts.length
+    this.partMapping[rowData['PartNumber']] = index
+    this.parts.push({
+      row,
+      hilighted: false,
+    })
   }
 
   selectPart(partNumber) {
@@ -216,6 +242,7 @@ class BOM {
       }
     }
   }
+
   emit(eventName, event) {
     const listeners = this.listeners[eventName] || []
 

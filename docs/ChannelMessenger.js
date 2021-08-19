@@ -37,14 +37,21 @@ class ChannelMessenger {
       console.log('viewer loaded')
       // Note: without this timeout, the Svelte app
       // has not initialized its ChannelMessenger by the time
-      // we send the init message. We may be able to remove this after
-      // Mauro's updates.
+      // we send the init message. We keep sending messages until the
+      // iframe responds
       id = setInterval(() => {
         // Transfer port2 to the viewer
         try {
           viewer.contentWindow.postMessage('init', '*', [channel.port2])
         } catch (err) {
-          console.log(err)
+          const str = '' + err
+          if (
+            !str.startsWith(
+              "DataCloneError: Failed to execute 'postMessage' on 'Window': Port at index 0 is already neutered."
+            )
+          ) {
+            console.log(str)
+          }
         }
       }, 50)
     })

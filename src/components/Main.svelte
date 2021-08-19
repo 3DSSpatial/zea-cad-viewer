@@ -38,8 +38,9 @@
     EnvMap,
     InstanceItem,
     CameraManipulator,
+    AssetLoadContext,
   } = window.zeaEngine
-  const { CADAsset, CADBody } = window.zeaCad
+  const { CADAsset, CADBody, CADPart } = window.zeaCad
   const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
     window.zeaUx
 
@@ -58,8 +59,8 @@
     // the part body or the instanced body
     while (
       item &&
-      !(item instanceof CADBody) &&
-      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
+      !(item instanceof CADPart) &&
+      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADPart)
     ) {
       item = item.getOwner()
     }
@@ -68,9 +69,11 @@
 
   let renderer
 
-  const loadZCADAsset = (url) => {
+  const loadZCADAsset = (url, resources) => {
     const asset = new CADAsset()
-    asset.load(url).then(() => {
+    const context = new AssetLoadContext()
+    context.resources = resources
+    asset.load(url, context).then(() => {
       renderer.frameAll()
     })
     $assets.addChild(asset)
@@ -379,7 +382,7 @@
           $assets.removeAllChildren()
         }
 
-        const asset = loadAsset(data.url)
+        const asset = loadZCADAsset(data.url, data.resources)
         asset.once('loaded', () => {
           if (!data.convertZtoY) {
             // Rotate the model so 'up' is the correct direction
@@ -407,21 +410,27 @@
         }
       })
 
+      let recievingSelectionnChange = false
       client.on('selectItems', (data) => {
+        recievingSelectionnChange = true
         const items = []
         data.paths.forEach((path) => {
           const treeItem = rootAsset.resolvePath(path)
           if (treeItem) items.push(treeItem)
         })
         $selectionManager.selectItems(items, false)
+        recievingSelectionnChange = false
       })
       client.on('deselectItems', (data) => {
+        recievingSelectionnChange = true
+        console.log('deselectItems', data.path)
         const items = []
         data.paths.forEach((path) => {
           const treeItem = rootAsset.resolvePath(path)
           if (treeItem) items.push(treeItem)
         })
         $selectionManager.deselectItems(items)
+        recievingSelectionnChange = false
       })
 
       client.on('unloadCADFile', (data) => {
@@ -435,12 +444,21 @@
       })
 
       $selectionManager.on('selectionChanged', (event) => {
-        const { selection } = event
+        if (recievingSelectionnChange) return
+        const { selection, prevSelection } = event
         const selectionPaths = []
         selection.forEach((item) =>
           selectionPaths.push(item.getPath().slice(2))
         )
-        client.send('selectionChanged', { selection: selectionPaths })
+        const deselectionPaths = []
+        prevSelection.forEach((item) => {
+          if (!selection.has(item))
+            deselectionPaths.push(item.getPath().slice(2))
+        })
+        client.send('selectionChanged', {
+          selection: selectionPaths,
+          deselection: deselectionPaths,
+        })
       })
     }
     /** EMBED MESSAGING END */
