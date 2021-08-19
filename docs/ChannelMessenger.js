@@ -24,6 +24,7 @@ var ID = function () {
 
 class ChannelMessenger {
   constructor(viewer) {
+    console.log('client Side ChannelMessenger')
     this.listeners = {}
     this.resolves = {}
 
@@ -31,24 +32,27 @@ class ChannelMessenger {
     this.port1 = channel.port1
 
     // Wait for the viewer to load
-
+    let id
     viewer.addEventListener('load', () => {
-      // Listen for messages on port1
-      this.port1.onmessage = onMessage
-
+      console.log('viewer loaded')
       // Note: without this timeout, the Svelte app
       // has not initialized its ChannelMessenger by the time
       // we send the init message. We may be able to remove this after
       // Mauro's updates.
-      setTimeout(() => {
+      id = setInterval(() => {
         // Transfer port2 to the viewer
-        viewer.contentWindow.postMessage('init', '*', [channel.port2])
+        try {
+          viewer.contentWindow.postMessage('init', '*', [channel.port2])
+        } catch (err) {
+          console.log(err)
+        }
       }, 50)
     })
 
-    // Handle messages received on port1
-    const onMessage = (e) => {
+    // Listen for messages on port1
+    this.port1.onmessage = (e) => {
       if (e.data == 'ready') {
+        clearInterval(id)
         this.emit('ready')
       } else {
         if (Array.isArray(e.data) && e.data.length == 2) {

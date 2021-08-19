@@ -343,6 +343,8 @@
     if (embeddedMode) {
       const client = createClient()
 
+      let rootAsset
+
       client.on('setBackgroundColor', (data) => {
         const color = new Color(data.color)
         $scene.getSettings().getParameter('BackgroundColor').setValue(color)
@@ -388,12 +390,14 @@
             // xfo.tr.z = -box.p0.z
             asset.getParameter('LocalXfo').setValue(xfo)
           }
-
+          console.log('loadCADFile', data._id)
           if (data._id) {
             const tree = buildTree(asset)
+            console.log('tree', tree)
             client.send(data._id, { modelStructure: tree })
           }
         })
+        rootAsset = asset
       })
 
       client.on('getModelStructure', (data) => {
@@ -401,6 +405,23 @@
           const tree = buildTree($assets)
           client.send(data._id, { modelStructure: tree })
         }
+      })
+
+      client.on('selectItems', (data) => {
+        const items = []
+        data.paths.forEach((path) => {
+          const treeItem = rootAsset.resolvePath(path)
+          if (treeItem) items.push(treeItem)
+        })
+        $selectionManager.selectItems(items, false)
+      })
+      client.on('deselectItems', (data) => {
+        const items = []
+        data.paths.forEach((path) => {
+          const treeItem = rootAsset.resolvePath(path)
+          if (treeItem) items.push(treeItem)
+        })
+        $selectionManager.deselectItems(items)
       })
 
       client.on('unloadCADFile', (data) => {
