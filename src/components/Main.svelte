@@ -55,13 +55,7 @@
   let files = ''
 
   const filterItemSelection = (item) => {
-    // Propagate selections up from the edges and surfaces up to
-    // the part body or the instanced body
-    while (
-      item &&
-      !(item instanceof CADPart) &&
-      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADPart)
-    ) {
+    while (item && !(item instanceof CADPart)) {
       item = item.getOwner()
     }
     return item
@@ -383,20 +377,19 @@
         }
 
         const asset = loadZCADAsset(data.url, data.resources)
-        asset.once('loaded', () => {
-          if (!data.convertZtoY) {
-            // Rotate the model so 'up' is the correct direction
-            const xfo = asset.getParameter('LocalXfo').getValue()
-            xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
+        if (!data.convertZtoY) {
+          // Rotate the model so 'up' is the correct direction
+          const xfo = asset.getParameter('LocalXfo').getValue()
+          xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
 
-            // const box = asset.getParameter('BoundingBox').getValue()
-            // xfo.tr.z = -box.p0.z
-            asset.getParameter('LocalXfo').setValue(xfo)
-          }
+          // const box = asset.getParameter('BoundingBox').getValue()
+          // xfo.tr.z = -box.p0.z
+          asset.getParameter('LocalXfo').setValue(xfo)
+        }
+        asset.once('loaded', () => {
           console.log('loadCADFile', data._id)
           if (data._id) {
             const tree = buildTree(asset)
-            console.log('tree', tree)
             client.send(data._id, { modelStructure: tree })
           }
         })
@@ -423,7 +416,7 @@
       })
       client.on('deselectItems', (data) => {
         recievingSelectionnChange = true
-        console.log('deselectItems', data.path)
+        console.log('deselectItems', data.paths)
         const items = []
         data.paths.forEach((path) => {
           const treeItem = rootAsset.resolvePath(path)
@@ -447,9 +440,10 @@
         if (recievingSelectionnChange) return
         const { selection, prevSelection } = event
         const selectionPaths = []
-        selection.forEach((item) =>
-          selectionPaths.push(item.getPath().slice(2))
-        )
+        selection.forEach((item) => {
+          if (!prevSelection.has(item))
+            selectionPaths.push(item.getPath().slice(2))
+        })
         const deselectionPaths = []
         prevSelection.forEach((item) => {
           if (!selection.has(item))

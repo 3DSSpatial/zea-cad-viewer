@@ -18,15 +18,12 @@ client.on('selectionChanged', (data) => {
 
 const partMapping = {}
 const pathMapping = {}
+const partSelCounts = {}
 const buildPartMapping = (modelStructure) => {
   const traverse = (item, parentpath) => {
     const path = [...parentpath, item.name]
-    if (item.name == '2013') {
-      console.log(item.name, path)
-    }
     if (!(item.name in partMapping)) partMapping[item.name] = []
     partMapping[item.name].push(path)
-
     pathMapping[path] = item.name
 
     if (item.children) {
@@ -39,16 +36,23 @@ const buildPartMapping = (modelStructure) => {
 }
 
 const selectionChanged = (selection, deselection) => {
-  selection.forEach((path) => {
-    if (path[path.length - 1].startsWith('Body')) path.pop()
-    const partNumber = pathMapping[path]
-    bom.selectPart(partNumber)
-  })
   deselection.forEach((path) => {
-    if (path[path.length - 1].startsWith('Body')) path.pop()
     const partNumber = pathMapping[path]
-    bom.deselectPart(partNumber)
+    if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
+    partSelCounts[partNumber]--
   })
+  selection.forEach((path) => {
+    const partNumber = pathMapping[path]
+    if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
+    partSelCounts[partNumber]++
+  })
+  for (let partNumber in partSelCounts) {
+    if (partSelCounts[partNumber] > 0) {
+      bom.selectPart(partNumber)
+    } else {
+      bom.deselectPart(partNumber)
+    }
+  }
 }
 // //////////////////////////////////////////
 // BOM Display
@@ -62,7 +66,6 @@ if (urlParams.has('BOM')) {
   bom
     .load(document.location.origin + urlParams.get('BOM'))
     .then((resources) => {
-      console.log(resources)
       const loadCAD = () => {
         client
           .do('loadCADFile', {
@@ -84,16 +87,22 @@ if (urlParams.has('BOM')) {
     })
 }
 bom.addListener('rowSelected', (event) => {
-  if (event.PartNumber in partMapping) {
+  const { PartNumber } = event
+  if (PartNumber in partMapping) {
+    if (!(PartNumber in partSelCounts)) partSelCounts[PartNumber] = 0
+    partSelCounts[PartNumber] += partMapping[PartNumber].length
     client.do('selectItems', {
-      paths: partMapping[event.PartNumber],
+      paths: partMapping[PartNumber],
     })
   }
 })
 bom.addListener('rowDeselected', (event) => {
-  if (event.PartNumber in partMapping) {
+  const { PartNumber } = event
+  if (PartNumber in partMapping) {
+    if (!(PartNumber in partSelCounts)) partSelCounts[PartNumber] = 0
+    partSelCounts[PartNumber] -= partMapping[PartNumber].length
     client.do('deselectItems', {
-      paths: partMapping[event.PartNumber],
+      paths: partMapping[PartNumber],
     })
   }
 })
