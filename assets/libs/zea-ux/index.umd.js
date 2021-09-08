@@ -2476,7 +2476,7 @@ void main(void) {
       }
 
       for (const treeItem of treeItems) {
-        if (!treeItem.isSelected()) {
+        if (!selection.has(treeItem)) {
           treeItem.setSelected(true);
           selection.add(treeItem);
         }
@@ -2506,7 +2506,7 @@ void main(void) {
       const prevSelection = new Set(selection);
 
       for (const treeItem of treeItems) {
-        if (treeItem.isSelected()) {
+        if (selection.has(treeItem)) {
           treeItem.setSelected(false);
           selection.delete(treeItem);
         }
