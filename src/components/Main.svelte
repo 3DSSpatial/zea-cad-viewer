@@ -43,8 +43,6 @@
   const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
     window.zeaUx
 
-  const { Session, SessionSync } = window.zeaCollab
-
   let canvas
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
@@ -62,27 +60,12 @@
 
   let renderer
 
+  /** LOAD ASSETS METHODS START */
   const loadZCADAsset = (url, resources) => {
     const asset = new CADAsset()
     const context = new AssetLoadContext()
     context.resources = resources
     asset.load(url, context).then(() => {
-      renderer.frameAll()
-    })
-    $assets.addChild(asset)
-    return asset
-  }
-
-  /** LOAD ASSETS METHODS START */
-  const { GLTFAsset } = gltfLoader
-  const loadGLTFAsset = (url, filename) => {
-    const asset = new GLTFAsset('gltf')
-    asset.load(url, filename).then(() => {
-      const box = asset.getParameter('BoundingBox').getValue()
-      const xfo = new Xfo()
-      // xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-      xfo.tr.z = -box.p0.z
-      asset.getParameter('LocalXfo').setValue(xfo)
       renderer.frameAll()
     })
     $assets.addChild(asset)
@@ -271,31 +254,6 @@
       loadAsset(assetUrl, assetUrl)
     }
     /** LOAD ASSETS END */
-
-    /** COLLAB START /
-    if (!embeddedMode) {
-      const userData = await auth.getUserData()
-      if (!userData) {
-        return
-      }
-      appData.userData = userData
-
-      if (collabEnabled) {
-        const SOCKET_URL = 'https://websocket-staging.zea.live'
-        // const roomId = assetUrl
-        const roomId = urlParams.get('roomId')
-        const session = new Session(userData, SOCKET_URL)
-        if (roomId) session.joinRoom(roomId)
-
-        const sessionSync = new SessionSync(session, appData, userData, {})
-
-        appData.session = session
-        appData.sessionSync = sessionSync
-
-        APP_DATA.update(() => appData)
-      }
-    }
-    /** COLLAB END */
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
