@@ -63,28 +63,25 @@ const bom = new BOM(table)
 
 const urlParams = new URLSearchParams(window.location.search)
 if (urlParams.has('BOM')) {
-  bom
-    .load(document.location.origin + urlParams.get('BOM'))
-    .then((resources) => {
-      const loadCAD = () => {
-        client
-          .do('loadCADFile', {
-            url:
-              document.location.origin +
-              '/data/SolidworksTrailor/2034.sldasm.zcad',
-            resources,
-          })
-          .then((data) => {
-            logger.logJson('modelStructure', data)
-            buildPartMapping(data.modelStructure)
-          })
-      }
-      if (!loaded) {
-        client.on('ready', loadCAD)
-      } else {
-        loadCAD()
-      }
-    })
+  const basePath = location.protocol + '//' + location.host + location.pathname
+  bom.load(basePath + urlParams.get('BOM')).then((resources) => {
+    const loadCAD = () => {
+      client
+        .do('loadCADFile', {
+          url: basePath + '/data/SolidworksTrailor/2034.sldasm.zcad',
+          resources,
+        })
+        .then((data) => {
+          logger.logJson('modelStructure', data)
+          buildPartMapping(data.modelStructure)
+        })
+    }
+    if (!loaded) {
+      client.on('ready', loadCAD)
+    } else {
+      loadCAD()
+    }
+  })
 }
 bom.addListener('rowSelected', (event) => {
   const { PartNumber } = event
