@@ -64,8 +64,8 @@ const bom = new BOM(table)
 const urlParams = new URLSearchParams(window.location.search)
 if (urlParams.has('BOM')) {
   const currURL = location.protocol + '//' + location.host + location.pathname
-  const base = currURL.substring(0, currURL.lastIndexOf('/'))
-  bom.load(base + urlParams.get('BOM')).then((resources) => {
+  const basePath = currURL.substring(0, currURL.lastIndexOf('/'))
+  bom.load(basePath + urlParams.get('BOM')).then((resources) => {
     const loadCAD = () => {
       client
         .do('loadCADFile', {
