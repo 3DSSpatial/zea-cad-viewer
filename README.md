@@ -87,7 +87,7 @@ client.on('somethingChanged', (data) => {
 
 Within the zea-cad-viewer code, you can add support for your own commands by adding handlers for various command names.
 
-#### Send Commamds
+#### Send Commands
 
 Used to send a command from the host page to the embed page, but a response is not expected.
 
@@ -207,6 +207,22 @@ To load version 2 off the Part, provide the url for that version in the resource
 > Note: To filter out parts or sub assembly from your assembly, simply omit those parts from the resources table.
 
 > Note: If no resources dictionary is provided, XRefs will generate a url relative to the url of the assembly zcad file. The generated url uses a zcad naming convention which includes the original file name and suffix. So if a source CAD file was called 'Foo.step', the generated url will append '.zcad' to the source filename, giving 'Foo.step.zcad'.
+
+##### Live BOM Demo
+
+The BOM demo is a sample that loads an assembly made up of many individual zcad files. A root assembly zcad file is loaded, while being provided a resources tables specifying which parts to load.
+
+See the individual assembly and part zcad files here:
+
+> https://github.com/ZeaInc/zea-cad-viewer/tree/main/docs/data/SolidworksTrailor
+
+Load the trailer using BOM1
+
+https://docs.zea.live/zea-cad-viewer/BOM.html?BOM=/data/BOM1.json
+
+Load the trailer using BOM2
+
+https://docs.zea.live/zea-cad-viewer/BOM.html?BOM=/data/BOM2.json
 
 ##### Results:
 
