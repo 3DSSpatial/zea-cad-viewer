@@ -175,10 +175,10 @@ client
 
 ##### Payload:
 
-zcad: the URL of the zcad accessible to the app.
-addToCurrentScene: If set to true, adds the new file to the scene containing the existing file. Else the scene is cleared and the new file is loaded.
-convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the model to correctly orient the data according to the viewer axis system.
-resources: The Resources option is a dictionary mapping source CAD files to the converted zcad files.
+- zcad: the URL of the zcad accessible to the app.
+- addToCurrentScene: If set to true, adds the new file to the scene containing the existing file. Else the scene is cleared and the new file is loaded.
+- convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the model to correctly orient the data according to the viewer axis system.
+- resources: The Resources option is a dictionary mapping source CAD files to the converted zcad files.
 
 The zcad file format now supports XRefs. XRefs are simply a CADAsset which is embedded into the tree of another zcad file. During loading, the XRef loads and it contains a reference to a CAD file that it must load.
 
