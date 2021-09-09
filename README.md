@@ -8,7 +8,6 @@ zcad file can be produced using a few different mechanisims. The Zea Cloud Hello
 
 https://github.com/ZeaInc/zea-cloud-hello-world
 
-
 # Embedding the Zea CAD Viewer in your own Web App
 
 ## Live Demo
@@ -166,6 +165,8 @@ client
   .do('loadCADFile', {
     url: '../foo.zcad',
     addToCurrentScene: false,
+    convertZtoY: true,
+    resources: { 'Foo.step': 'url/to/Foo.step.zcad' },
   })
   .then((data) => {
     console.log('loadCADFile Loaded', data)
@@ -177,6 +178,35 @@ client
 zcad: the URL of the zcad accessible to the app.
 addToCurrentScene: If set to true, adds the new file to the scene containing the existing file. Else the scene is cleared and the new file is loaded.
 convertZtoY: If the data coordinates expected 'Y' up, this parameter rotates the model to correctly orient the data according to the viewer axis system.
+resources: The Resources option is a dictionary mapping source CAD files to the converted zcad files.
+
+The zcad file format now supports XRefs. XRefs are simply a CADAsset which is embedded into the tree of another zcad file. During loading, the XRef loads and it contains a reference to a CAD file that it must load.
+
+The XRef looks up the resources table using the name of the original CAD file as the key. If the resources tables provides a urls for that source CAD file name, it will load that url.
+
+The resources dictionary can be generated from a Bill Of Materials, and allows the loading code to specify exactly which part should be loaded into the assembly.
+
+e.g. You might have a Part called Part.step, but 2 different versions of the Part. e.g. Part.1.step and Part.2.step. The resources table can provide the url for the Part that you intend to load, based on a BOM configuration.
+
+To load version one off the Part, provide the url for that version in the resources table.
+
+```
+{
+  "Part.step": "url/to/Part.1.step"
+}
+```
+
+To load version 2 off the Part, provide the url for that version in the resources table.
+
+```
+{
+  "Part.step": "url/to/Part.2.step"
+}
+```
+
+> Note: To filter out parts or sub assembly from your assembly, simply omit those parts from the resources table.
+
+> Note: If no resources dictionary is provided, XRefs will generate a url relative to the url of the assembly zcad file. The generated url uses a zcad naming convention which includes the original file name and suffix. So if a source CAD file was called 'Foo.step', the generated url will append '.zcad' to the source filename, giving 'Foo.step.zcad'.
 
 ##### Results:
 
