@@ -1,7 +1,8 @@
 <script>
+  import { redirect } from '@roxi/routify'
   import { onMount } from 'svelte'
 
-  const { CameraManipulator } = window.zeaEngine
+  const { Quat, Vec3, CameraManipulator } = window.zeaEngine
   const { ToolManager } = window.zeaUx
 
   import Button from './Button.svelte'
@@ -14,6 +15,8 @@
   import UserChip from './UserChip.svelte'
   import UsersChips from './UsersChips.svelte'
 
+  import { auth } from '../helpers/auth'
+
   import { APP_DATA } from '../stores/appData'
   import { ui } from '../stores/ui.js'
 
@@ -24,6 +27,8 @@
   let vrToggleMenuItemDisabled = true
 
   let cameraManipulator
+  let isTumblerEnabled = true
+  let isTurnTableEnabled = false
   let isSelectionEnabled = false
   let isTransformHandlesEnabled = false
   let renderer
@@ -61,6 +66,38 @@
         break
     }
   })
+
+  const handleTumblerEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.tumbler
+    )
+    isTumblerEnabled = true
+    isTurnTableEnabled = false
+  }
+  const handleTurnTableEnabled = () => {
+    cameraManipulator.setDefaultManipulationMode(
+      CameraManipulator.MANIPULATION_MODES.turntable
+    )
+    // The Tumbler mode prevents the camera from rolling upside down, so we correct it here.
+    const cameraXfo = renderer
+      .getViewport()
+      .getCamera()
+      .getParameter('GlobalXfo')
+      .getValue()
+    const zaxis = cameraXfo.ori.getZaxis()
+    let t = 0
+    const id = setInterval(() => {
+      t += 0.1
+      const quat = new Quat()
+      const xfo = cameraXfo.clone()
+      quat.setFromDirectionAndUpvector(zaxis, new Vec3(0, 0, 1))
+      xfo.ori = cameraXfo.ori.lerp(quat, Math.min(t, 1.0))
+      renderer.getViewport().getCamera().getParameter('GlobalXfo').setValue(xfo)
+      if (t >= 1.0) clearInterval(id)
+    }, 20)
+    isTurnTableEnabled = true
+    isTumblerEnabled = false
+  }
 
   const handleMenuSelectionChange = () => {
     if (!toolManager) {
@@ -223,6 +260,7 @@
     }
 
     await auth.signOut()
+    $redirect('/login')
   }
 
   const handleClickMenuToggle = () => {
@@ -231,9 +269,9 @@
 </script>
 
 {#if !embeddedMode}
-  <header class="z-50 flex items-center px-1 py-1 text-gray-200 gap-2 sm:px-2">
+  <header class="flex gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50">
     <button
-      class="flex justify-center cursor-default w-7 h-7"
+      class="cursor-default flex justify-center w-7 h-7"
       on:click={handleClickMenuToggle}
       title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
     >
@@ -253,6 +291,16 @@
               iconLeft="crop_free"
               shortcut="F"
               on:click={handleFrameAll}
+            />
+            <MenuItemToggle
+              label="Camera Mode: TurnTable"
+              bind:checked={isTurnTableEnabled}
+              on:change={handleTurnTableEnabled}
+            />
+            <MenuItemToggle
+              label="Camera Mode: Tumbler"
+              bind:checked={isTumblerEnabled}
+              on:change={handleTumblerEnabled}
             />
           </Menu>
         </MenuBarItem>
@@ -290,17 +338,6 @@
           </Menu>
         </MenuBarItem>
 
-        <MenuBarItem label="Collab" let:isOpen>
-          <Menu {isOpen}>
-            <MenuItem
-              iconLeft="visibility"
-              label="Direct Attention"
-              shortcut="Ctrl+N"
-              on:click={handleDA}
-            />
-          </Menu>
-        </MenuBarItem>
-
         <MenuBarItem label="VR" let:isOpen>
           <Menu {isOpen}>
             <MenuItem
@@ -308,30 +345,9 @@
               label={vrToggleMenuItemLabel}
               on:click={handleLaunchVR}
             />
-            <MenuItem
-              label="Enable Spectator Mode"
-              on:click={handleToggleVRSpatatorMode}
-            />
           </Menu>
         </MenuBarItem>
       </MenuBar>
     </div>
-
-    {#if $APP_DATA}
-      {#if collabEnabled}
-        <UsersChips session={$APP_DATA.session} />
-      {/if}
-      {#if !collabEnabled}
-        <div class="flex-1" />
-      {/if}
-
-      <!--
-      <UserChip user={$APP_DATA.userData}>
-        <div class="text-center">
-          <Button on:click={handleSignOut}>Sign Out</Button>
-        </div>
-      </UserChip>
-      -->
-    {/if}
   </header>
 {/if}

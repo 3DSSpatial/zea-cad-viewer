@@ -21,6 +21,7 @@ const {
 const RENDER_MODES = {
   WIREFRAME: Symbol(),
   FLAT: Symbol(),
+  FLAT_WHITE: Symbol(),
   HIDDEN_LINE: Symbol(),
   SHADED: Symbol(),
   SHADED_AND_EDGES: Symbol(),
@@ -79,6 +80,35 @@ const handleChangeRenderModeWireframe = () => {
       })
     }
   })
+}
+const handleChangeRenderModeFlatWhite = (pub = true) => {
+  if (mode == RENDER_MODES.FLAT_WHITE) {
+    return
+  }
+  mode = RENDER_MODES.FLAT_WHITE
+  const { assets, scene, renderer, session } = $APP_DATA
+  renderer.outlineThickness = 1
+  renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+  const backgroundColor = scene
+    .getSettings()
+    .getParameter('BackgroundColor')
+    .getValue()
+  const whiteMaterial = new Material()
+  whiteMaterial.setShaderName('FlatSurfaceShader')
+  whiteMaterial.getParameter('BaseColor').setValue(backgroundColor)
+
+  assets.traverse((item) => {
+    if (item instanceof GeomItem) {
+      const geom = item.getParameter('Geometry').getValue()
+      if (geom instanceof Mesh || geom instanceof MeshProxy) {
+        cacheMaterial(item)
+        item.getParameter('Visible').setValue(true)
+        item.getParameter('Material').setValue(whiteMaterial)
+      }
+    }
+  })
+  mode = RENDER_MODES.FLAT_WHITE
+  if (pub && session) session.pub('setRenderMode', { mode: 'FLAT_WHITE' })
 }
 const handleChangeRenderModeFlat = () => {
   if (mode == RENDER_MODES.FLAT) {
@@ -223,6 +253,8 @@ const changeRenderMode = (mode) => {
     handleChangeRenderModeWireframe()
   } else if (mode === RENDER_MODES.FLAT) {
     handleChangeRenderModeFlat()
+  } else if (mode === RENDER_MODES.FLAT_WHITE) {
+    handleChangeRenderModeFlatWhite
   } else if (mode === RENDER_MODES.HIDDEN_LINE) {
     handleChangeRenderModeHiddenLine()
   } else if (mode === RENDER_MODES.SHADED) {

@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte'
-  import { get } from 'svelte/store'
 
   import '../helpers/fps-display'
 
@@ -13,6 +12,7 @@
   import Drawer from '../components/Drawer.svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import Sidebar from '../components/Sidebar.svelte'
+  import DropZone from '../components/DropZone.svelte'
 
   import { APP_DATA } from '../stores/appData'
   import { assets } from '../stores/assets.js'
@@ -43,6 +43,8 @@
   const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
     window.zeaUx
 
+  const { GLTFAsset } = gltfLoader
+
   let canvas
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
@@ -50,15 +52,22 @@
   const collabEnabled = urlParams.has('roomId')
   let progress
   let files = ''
+  let fileLoaded = false
+  const appData = {}
+  let renderer
 
   const filterItemSelection = (item) => {
-    while (item && !(item instanceof CADPart)) {
+    // Propagate selections up from the edges and surfaces up to
+    // the part body or the instanced body
+    while (
+      item &&
+      !(item instanceof CADBody) &&
+      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
+    ) {
       item = item.getOwner()
     }
     return item
   }
-
-  let renderer
 
   /** LOAD ASSETS METHODS START */
   const loadZCADAsset = (url, resources) => {
@@ -72,13 +81,31 @@
     return asset
   }
 
-  const loadAsset = (url, fileName) => {
-    return loadZCADAsset(url)
+  const loadGLTFAsset = (url, filename) => {
+    const asset = new GLTFAsset()
+    asset.load(url, filename).then(() => {
+      renderer.frameAll()
+    })
+    $assets.addChild(asset)
+    return asset
+  }
+  const loadAsset = (url, filename) => {
+    let res
+    if (filename.endsWith('zcad')) {
+      res = loadZCADAsset(url)
+    } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
+      res = loadGLTFAsset(url, filename)
+    }
+
+    if (res) fileLoaded = true
+    return res
   }
   /** LOAD ASSETS METHODS END */
 
   onMount(async () => {
-    renderer = new GLRenderer(canvas)
+    renderer = new GLRenderer(canvas, {
+      debugGeomIds: urlParams.has('debugGeomIds'),
+    })
 
     $scene = new Scene()
 
@@ -163,7 +190,7 @@
 
     /** SELECTION END */
 
-    /* {{{ UX */
+    /** UX START */
     //long touch support
     var longTouchTimer = 0
     const camera = renderer.getViewport().getCamera()
@@ -234,7 +261,7 @@
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
     })
-    /* }}} UX */
+    /** UX END */
 
     /** PROGRESSBAR START */
     resourceLoader.on('progressIncremented', (event) => {
@@ -249,11 +276,52 @@
     /** FPS DISPLAY END */
 
     /** LOAD ASSETS START */
+    let assetUrl
     if (urlParams.has('zcad')) {
-      const assetUrl = urlParams.get('zcad')
-      loadAsset(assetUrl, assetUrl)
+      assetUrl = urlParams.get('zcad')
+      loadAsset(assetUrl)
+      fileLoaded = true
+    }
+    if (urlParams.has('gltf')) {
+      assetUrl = urlParams.get('gltf')
+      loadAsset(assetUrl)
+      fileLoaded = true
     }
     /** LOAD ASSETS END */
+
+    /** COLLAB START*/
+    // if (!embeddedMode) {
+    //   const userData = await auth.getUserData()
+    //   if (!userData) {
+    //     return
+    //   }
+    //   appData.userData = userData
+
+    //   if (collabEnabled) {
+    //     const SOCKET_URL = 'https://websocket-staging.zea.live'
+    //     // const roomId = assetUrl
+    //     const roomId = urlParams.get('roomId')
+    //     const session = new Session(userData, SOCKET_URL)
+    //     if (roomId) session.joinRoom(roomId)
+
+    //     const sessionSync = new SessionSync(session, appData, userData, {
+    //       /* Avatars scale based on the distance to the target */
+    //       scaleAvatarWithFocalDistance: true,
+    //       /* The overal size multiplier of the avatar. */
+    //       avatarScale: 2.0,
+    //     })
+
+    //     appData.session = session
+    //     appData.sessionSync = sessionSync
+
+    //     appData.session.sub('loadAsset', (data, user) => {
+    //       loadAsset(data.url, data.filename)
+    //     })
+
+    //     APP_DATA.update(() => appData)
+    //   }
+    // }
+    /** COLLAB END */
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
@@ -377,10 +445,10 @@
     /** EMBED MESSAGING END */
 
     /** DYNAMIC SELECTION UI START */
-    // $selectionManager.on('leadSelectionChanged', (event) => {
-    //   parameterOwner = event.treeItem
-    //   $ui.shouldShowParameterOwnerWidget = parameterOwner
-    // })
+    $selectionManager.on('leadSelectionChanged', (event) => {
+      parameterOwner = event.treeItem
+      $ui.shouldShowParameterOwnerWidget = parameterOwner
+    })
     /** DYNAMIC SELECTION UI END */
 
     APP_DATA.set(appData)
@@ -408,9 +476,24 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
-    const objectURL = window.URL.createObjectURL(files)
+    const reader = new FileReader()
 
-    const asset = loadAsset(objectURL, files.name)
+    reader.addEventListener(
+      'load',
+      function () {
+        const url = reader.result
+        const filename = files.name
+        loadAsset(url, filename)
+
+        // If a collabroative session is running, pass the data
+        // to the other session users to load.
+        const { session } = appData
+        if (session) session.pub('loadAsset', { url, filename })
+      },
+      false
+    )
+
+    reader.readAsDataURL(files)
   }
 
   /** LOAD ASSETS FROM FILE END */
@@ -418,10 +501,13 @@
   $: parameterOwner = null
 </script>
 
-<main class="relative flex-1 Main">
-  <canvas bind:this={canvas} class="absolute w-full h-full" />
+<main class="Main flex-1 relative">
+  <canvas bind:this={canvas} class="absolute h-full w-full" />
+  {#if !fileLoaded}
+    <DropZone bind:files on:changeFile={handleCadFile} />
+  {/if}
 
-  <div class="absolute flex justify-center w-full bottom-10">
+  <div class="absolute bottom-10 w-full flex justify-center">
     <Toolbar />
   </div>
 
