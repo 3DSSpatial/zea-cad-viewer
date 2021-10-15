@@ -476,6 +476,8 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
+    $assets.removeAllChildren()
+
     const reader = new FileReader()
 
     reader.addEventListener(
@@ -503,9 +505,7 @@
 
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
-  {#if !fileLoaded}
-    <DropZone bind:files on:changeFile={handleCadFile} />
-  {/if}
+  <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
 
   <div class="absolute bottom-10 w-full flex justify-center">
     <Toolbar />
