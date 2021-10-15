@@ -5,7 +5,7 @@ const isEmbedded = urlParams.has('embedded')
 
 const ui = writable({
   currentMenuBarItem: null,
-  shouldShowDrawer: !isEmbedded && window.innerWidth >= 768,
+  shouldShowDrawer: false,
   shouldShowParameterOwnerWidget: false,
 })
 
