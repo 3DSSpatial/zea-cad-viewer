@@ -162,7 +162,6 @@
     initItem()
   })
   afterUpdate(() => {
-    console.log('afterUpdate')
     if (expandPath) {
       expandSubTree(expandPath)
       expandPath = null
