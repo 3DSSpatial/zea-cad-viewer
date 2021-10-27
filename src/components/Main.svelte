@@ -77,6 +77,7 @@
       renderer.frameAll()
     })
     $assets.addChild(asset)
+    fileLoaded = true
     return asset
   }
 
@@ -86,18 +87,15 @@
       renderer.frameAll()
     })
     $assets.addChild(asset)
+    fileLoaded = true
     return asset
   }
   const loadAsset = (url, filename) => {
-    let res
     if (filename.endsWith('zcad')) {
-      res = loadZCADAsset(url)
+      return loadZCADAsset(url)
     } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
-      res = loadGLTFAsset(url, filename)
+      return loadGLTFAsset(url, filename)
     }
-
-    if (res) fileLoaded = true
-    return res
   }
   /** LOAD ASSETS METHODS END */
 
@@ -267,13 +265,11 @@
     let assetUrl
     if (urlParams.has('zcad')) {
       assetUrl = urlParams.get('zcad')
-      loadAsset(assetUrl)
-      fileLoaded = true
+      loadZCADAsset(assetUrl, assetUrl)
     }
     if (urlParams.has('gltf')) {
       assetUrl = urlParams.get('gltf')
-      loadAsset(assetUrl)
-      fileLoaded = true
+      loadGLTFAsset(assetUrl, assetUrl)
     }
     /** LOAD ASSETS END */
 
