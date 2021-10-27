@@ -6,6 +6,11 @@
   export let files
   export let fileLoaded
 
+  $: if (fileLoaded) {
+    const div = document.getElementById('fileDropZone')
+    div.classList.add('pointer-events-none')
+  }
+
   // Based on this answer: https://stackoverflow.com/a/61417954
   const dragenter = () => {
     // To enable the drop zone to
@@ -59,9 +64,7 @@
       <div class="m-auto">
         <div class="flex flex-col space-y-2 items-center justify-center">
           <i class="fas fa-cloud-upload-alt fa-3x text-currentColor" />
-          <p class="text-gray-700 text-center">
-            Drag your gltf or zcad files here or click in this area.
-          </p>
+          <p class="text-gray-700 text-center">Drag your gltf or zcad files here or click in this area.</p>
         </div>
       </div>
     </div>
