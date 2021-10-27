@@ -1,6 +1,5 @@
 <script>
   import { onMount } from 'svelte'
-  import { get } from 'svelte/store'
 
   import '../helpers/fps-display'
 
@@ -13,6 +12,7 @@
   import Drawer from '../components/Drawer.svelte'
   import ProgressBar from '../components/ProgressBar.svelte'
   import Sidebar from '../components/Sidebar.svelte'
+  import DropZone from '../components/DropZone.svelte'
 
   import { APP_DATA } from '../stores/appData'
   import { assets } from '../stores/assets.js'
@@ -40,8 +40,9 @@
     AssetLoadContext,
   } = window.zeaEngine
   const { CADAsset, CADBody, CADPart } = window.zeaCad
-  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
-    window.zeaUx
+  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } = window.zeaUx
+
+  const { GLTFAsset } = gltfLoader
 
   let canvas
   let fpsContainer
@@ -50,15 +51,22 @@
   const collabEnabled = urlParams.has('roomId')
   let progress
   let files = ''
+  let fileLoaded = false
+  const appData = {}
+  let renderer
 
   const filterItemSelection = (item) => {
-    while (item && !(item instanceof CADPart)) {
+    // Propagate selections up from the edges and surfaces up to
+    // the part body or the instanced body
+    while (
+      item &&
+      !(item instanceof CADBody) &&
+      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
+    ) {
       item = item.getOwner()
     }
     return item
   }
-
-  let renderer
 
   /** LOAD ASSETS METHODS START */
   const loadZCADAsset = (url, resources) => {
@@ -72,13 +80,37 @@
     return asset
   }
 
-  const loadAsset = (url, fileName) => {
-    return loadZCADAsset(url)
+  const loadGLTFAsset = (url, filename) => {
+    const asset = new GLTFAsset()
+    asset.load(url, filename).then(() => {
+      renderer.frameAll()
+    })
+    $assets.addChild(asset)
+    return asset
+  }
+  const loadAsset = (url, filename) => {
+    let res
+    if (filename.endsWith('zcad')) {
+      res = loadZCADAsset(url)
+    } else if (filename.endsWith('gltf') || filename.endsWith('glb')) {
+      res = loadGLTFAsset(url, filename)
+    }
+
+    if (res) fileLoaded = true
+    return res
   }
   /** LOAD ASSETS METHODS END */
 
+  class MyRenderer extends GLRenderer {
+    handleResize(displayWidth, displayHeight) {
+      super.handleResize(Math.max(4, displayWidth), Math.max(4, displayHeight))
+    }
+  }
+
   onMount(async () => {
-    renderer = new GLRenderer(canvas)
+    renderer = new MyRenderer(canvas, {
+      debugGeomIds: urlParams.has('debugGeomIds'),
+    })
 
     $scene = new Scene()
 
@@ -94,10 +126,7 @@
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     // $scene.setupGrid(10, 10)
-    $scene
-      .getSettings()
-      .getParameter('BackgroundColor')
-      .setValue(new Color(0.85, 0.85, 0.85, 1))
+    $scene.getSettings().getParameter('BackgroundColor').setValue(new Color(0.85, 0.85, 0.85, 1))
     renderer.setScene($scene)
 
     const appData = {}
@@ -117,9 +146,7 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
-    cameraManipulator.setDefaultManipulationMode(
-      CameraManipulator.MANIPULATION_MODES.tumbler
-    )
+    cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.tumbler)
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
@@ -146,24 +173,16 @@
     const selectionColor = new Color('#F9CE03')
     selectionColor.a = 0.1
     const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
-    $selectionManager.selectionGroup
-      .getParameter('HighlightColor')
-      .setValue(selectionColor)
-    $selectionManager.selectionGroup
-      .getParameter('SubtreeHighlightColor')
-      .setValue(subtreeColor)
+    $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(selectionColor)
+    $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(subtreeColor)
 
     // Color the selection rect.
     const selectionRectColor = new Color(0, 0, 0, 1)
-    selectionTool.rectItem
-      .getParameter('Material')
-      .getValue()
-      .getParameter('BaseColor')
-      .setValue(selectionRectColor)
+    selectionTool.rectItem.getParameter('Material').getValue().getParameter('BaseColor').setValue(selectionRectColor)
 
     /** SELECTION END */
 
-    /* {{{ UX */
+    /** UX START */
     //long touch support
     var longTouchTimer = 0
     const camera = renderer.getViewport().getCamera()
@@ -195,11 +214,7 @@
       if (longTouchTimer) {
         endLogTouchTimer(longTouchTimer)
       }
-      if (
-        event.pointerType == 'touch' &&
-        event.intersectionData &&
-        isMenuVisible
-      ) {
+      if (event.pointerType == 'touch' && event.intersectionData && isMenuVisible) {
         // The menu was opened by the long touch. Prevent any other actions from occuring.
         event.stopPropagation()
       }
@@ -234,7 +249,7 @@
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
     })
-    /* }}} UX */
+    /** UX END */
 
     /** PROGRESSBAR START */
     resourceLoader.on('progressIncremented', (event) => {
@@ -249,11 +264,52 @@
     /** FPS DISPLAY END */
 
     /** LOAD ASSETS START */
+    let assetUrl
     if (urlParams.has('zcad')) {
-      const assetUrl = urlParams.get('zcad')
-      loadAsset(assetUrl, assetUrl)
+      assetUrl = urlParams.get('zcad')
+      loadAsset(assetUrl)
+      fileLoaded = true
+    }
+    if (urlParams.has('gltf')) {
+      assetUrl = urlParams.get('gltf')
+      loadAsset(assetUrl)
+      fileLoaded = true
     }
     /** LOAD ASSETS END */
+
+    /** COLLAB START*/
+    // if (!embeddedMode) {
+    //   const userData = await auth.getUserData()
+    //   if (!userData) {
+    //     return
+    //   }
+    //   appData.userData = userData
+
+    //   if (collabEnabled) {
+    //     const SOCKET_URL = 'https://websocket-staging.zea.live'
+    //     // const roomId = assetUrl
+    //     const roomId = urlParams.get('roomId')
+    //     const session = new Session(userData, SOCKET_URL)
+    //     if (roomId) session.joinRoom(roomId)
+
+    //     const sessionSync = new SessionSync(session, appData, userData, {
+    //       /* Avatars scale based on the distance to the target */
+    //       scaleAvatarWithFocalDistance: true,
+    //       /* The overal size multiplier of the avatar. */
+    //       avatarScale: 2.0,
+    //     })
+
+    //     appData.session = session
+    //     appData.sessionSync = sessionSync
+
+    //     appData.session.sub('loadAsset', (data, user) => {
+    //       loadAsset(data.url, data.filename)
+    //     })
+
+    //     APP_DATA.update(() => appData)
+    //   }
+    // }
+    /** COLLAB END */
 
     /** EMBED MESSAGING START*/
     if (embeddedMode) {
@@ -270,12 +326,8 @@
         const color = new Color(data.color)
         // Note: the alpha value determines  the fill of the highlight.
         color.a = 0.1
-        $selectionManager.selectionGroup
-          .getParameter('HighlightColor')
-          .setValue(color)
-        $selectionManager.selectionGroup
-          .getParameter('SubtreeHighlightColor')
-          .setValue(color)
+        $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(color)
+        $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(color)
       })
 
       client.on('setRenderMode', (data) => {
@@ -284,9 +336,7 @@
 
       client.on('setCameraManipulationMode', (data) => {
         const mode = data.mode.toLowerCase()
-        cameraManipulator.setDefaultManipulationMode(
-          CameraManipulator.MANIPULATION_MODES[mode]
-        )
+        cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES[mode])
       })
 
       client.on('loadCADFile', (data) => {
@@ -360,13 +410,11 @@
         const { selection, prevSelection } = event
         const selectionPaths = []
         selection.forEach((item) => {
-          if (!prevSelection.has(item))
-            selectionPaths.push(item.getPath().slice(2))
+          if (!prevSelection.has(item)) selectionPaths.push(item.getPath().slice(2))
         })
         const deselectionPaths = []
         prevSelection.forEach((item) => {
-          if (!selection.has(item))
-            deselectionPaths.push(item.getPath().slice(2))
+          if (!selection.has(item)) deselectionPaths.push(item.getPath().slice(2))
         })
         client.send('selectionChanged', {
           selection: selectionPaths,
@@ -377,10 +425,10 @@
     /** EMBED MESSAGING END */
 
     /** DYNAMIC SELECTION UI START */
-    // $selectionManager.on('leadSelectionChanged', (event) => {
-    //   parameterOwner = event.treeItem
-    //   $ui.shouldShowParameterOwnerWidget = parameterOwner
-    // })
+    $selectionManager.on('leadSelectionChanged', (event) => {
+      parameterOwner = event.treeItem
+      $ui.shouldShowParameterOwnerWidget = parameterOwner
+    })
     /** DYNAMIC SELECTION UI END */
 
     APP_DATA.set(appData)
@@ -408,9 +456,26 @@
   /** LOAD ASSETS FROM FILE START */
 
   const handleCadFile = () => {
-    const objectURL = window.URL.createObjectURL(files)
+    $assets.removeAllChildren()
 
-    const asset = loadAsset(objectURL, files.name)
+    const reader = new FileReader()
+
+    reader.addEventListener(
+      'load',
+      function () {
+        const url = reader.result
+        const filename = files.name
+        loadAsset(url, filename)
+
+        // If a collabroative session is running, pass the data
+        // to the other session users to load.
+        const { session } = appData
+        if (session) session.pub('loadAsset', { url, filename })
+      },
+      false
+    )
+
+    reader.readAsDataURL(files)
   }
 
   /** LOAD ASSETS FROM FILE END */
@@ -418,10 +483,11 @@
   $: parameterOwner = null
 </script>
 
-<main class="relative flex-1 Main">
-  <canvas bind:this={canvas} class="absolute w-full h-full" />
+<main class="Main flex-1 relative">
+  <canvas bind:this={canvas} class="absolute h-full w-full" />
+  <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
 
-  <div class="absolute flex justify-center w-full bottom-10">
+  <div class="absolute bottom-10 w-full flex justify-center">
     <Toolbar />
   </div>
 

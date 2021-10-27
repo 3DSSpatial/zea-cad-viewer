@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from 'svelte'
   export let orientation = 'horizontal'
 
   import ToolbarItem from './ToolbarItem.svelte'
@@ -19,6 +20,7 @@
 
   import IconRenderModeWireframe from '../icons/IconRenderModeWireframe.svelte'
   import IconRenderModeFlat from '../icons/IconRenderModeFlat.svelte'
+  import IconRenderModeFlatWhite from '../icons/IconRenderModeFlatWhite.svelte'
   import IconRenderModeShaded from '../icons/IconRenderModeShaded.svelte'
   import IconRenderModeShadedAndEdges from '../icons/IconRenderModeShadedAndEdges.svelte'
   import IconRenderModePBR from '../icons/IconRenderModePBR.svelte'
@@ -175,6 +177,10 @@
     changeRenderMode(RENDER_MODES.FLAT)
     mode = RENDER_MODES.FLAT
   }
+  const handleChangeRenderModeFlatWhite = () => {
+    changeRenderMode(RENDER_MODES.FLAT_WHITE)
+    mode = RENDER_MODES.FLAT_WHITE
+  }
   const handleChangeRenderModeHiddenLine = () => {
     changeRenderMode(RENDER_MODES.HIDDEN_LINE)
     mode = RENDER_MODES.HIDDEN_LINE
@@ -253,6 +259,7 @@
     title="Renderer modes"
   >
     <IconRenderModeWireframe />
+
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
       <ToolbarItem
         isHighlighted={mode === RENDER_MODES.WIREFRAME}
@@ -267,6 +274,13 @@
         on:click={handleChangeRenderModeFlat}
       >
         <IconRenderModeFlat />
+      </ToolbarItem>
+      <ToolbarItem
+        isHighlighted={mode === RENDER_MODES.FLAT_WHITE}
+        title="FlatWhite"
+        on:click={handleChangeRenderModeFlatWhite}
+      >
+        <IconRenderModeFlatWhite />
       </ToolbarItem>
       <ToolbarItem
         isHighlighted={mode === RENDER_MODES.HIDDEN_LINE}

@@ -11,12 +11,7 @@
   import StringParameterWidget from './StringParameterWidget.svelte'
   import ColorParameterWidget from './ColorParameterWidget.svelte'
 
-  const {
-    BooleanParameter,
-    NumberParameter,
-    StringParameter,
-    ColorParameter,
-  } = window.zeaEngine
+  const { BooleanParameter, NumberParameter, StringParameter, ColorParameter } = window.zeaEngine
 
   componentRegistry.registerComponent((parameter) => {
     return parameter instanceof BooleanParameter
@@ -40,6 +35,15 @@
 
   let index = 0
   $: parameterOwner.getParameters().forEach((parameter) => {
+    // The tree view already displays this field
+    if (parameter.getName() == 'Visible') return
+    // The CADAsset has these properties, but they are not being used
+    // and should be removed soon.
+    if (parameter.getName() == 'DisplayEdges') return
+    // The CADBody has these properties, but they are not being used
+    // and should be removed soon.
+    if (parameter.getName() == 'Color') return
+    if (parameter.getName() == 'EdgeColor') return
     const component = componentRegistry.selectComponent(parameter)
     if (component) {
       items.push({
