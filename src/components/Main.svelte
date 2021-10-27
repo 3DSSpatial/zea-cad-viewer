@@ -40,8 +40,7 @@
     AssetLoadContext,
   } = window.zeaEngine
   const { CADAsset, CADBody, CADPart } = window.zeaCad
-  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } =
-    window.zeaUx
+  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } = window.zeaUx
 
   const { GLTFAsset } = gltfLoader
 
@@ -102,8 +101,14 @@
   }
   /** LOAD ASSETS METHODS END */
 
+  class MyRenderer extends GLRenderer {
+    handleResize(displayWidth, displayHeight) {
+      super.handleResize(Math.max(4, displayWidth), Math.max(4, displayHeight))
+    }
+  }
+
   onMount(async () => {
-    renderer = new GLRenderer(canvas, {
+    renderer = new MyRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
     })
 
@@ -121,10 +126,7 @@
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     // $scene.setupGrid(10, 10)
-    $scene
-      .getSettings()
-      .getParameter('BackgroundColor')
-      .setValue(new Color(0.85, 0.85, 0.85, 1))
+    $scene.getSettings().getParameter('BackgroundColor').setValue(new Color(0.85, 0.85, 0.85, 1))
     renderer.setScene($scene)
 
     const appData = {}
@@ -144,9 +146,7 @@
 
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
-    cameraManipulator.setDefaultManipulationMode(
-      CameraManipulator.MANIPULATION_MODES.tumbler
-    )
+    cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.tumbler)
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
@@ -173,20 +173,12 @@
     const selectionColor = new Color('#F9CE03')
     selectionColor.a = 0.1
     const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
-    $selectionManager.selectionGroup
-      .getParameter('HighlightColor')
-      .setValue(selectionColor)
-    $selectionManager.selectionGroup
-      .getParameter('SubtreeHighlightColor')
-      .setValue(subtreeColor)
+    $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(selectionColor)
+    $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(subtreeColor)
 
     // Color the selection rect.
     const selectionRectColor = new Color(0, 0, 0, 1)
-    selectionTool.rectItem
-      .getParameter('Material')
-      .getValue()
-      .getParameter('BaseColor')
-      .setValue(selectionRectColor)
+    selectionTool.rectItem.getParameter('Material').getValue().getParameter('BaseColor').setValue(selectionRectColor)
 
     /** SELECTION END */
 
@@ -222,11 +214,7 @@
       if (longTouchTimer) {
         endLogTouchTimer(longTouchTimer)
       }
-      if (
-        event.pointerType == 'touch' &&
-        event.intersectionData &&
-        isMenuVisible
-      ) {
+      if (event.pointerType == 'touch' && event.intersectionData && isMenuVisible) {
         // The menu was opened by the long touch. Prevent any other actions from occuring.
         event.stopPropagation()
       }
@@ -338,12 +326,8 @@
         const color = new Color(data.color)
         // Note: the alpha value determines  the fill of the highlight.
         color.a = 0.1
-        $selectionManager.selectionGroup
-          .getParameter('HighlightColor')
-          .setValue(color)
-        $selectionManager.selectionGroup
-          .getParameter('SubtreeHighlightColor')
-          .setValue(color)
+        $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(color)
+        $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(color)
       })
 
       client.on('setRenderMode', (data) => {
@@ -352,9 +336,7 @@
 
       client.on('setCameraManipulationMode', (data) => {
         const mode = data.mode.toLowerCase()
-        cameraManipulator.setDefaultManipulationMode(
-          CameraManipulator.MANIPULATION_MODES[mode]
-        )
+        cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES[mode])
       })
 
       client.on('loadCADFile', (data) => {
@@ -428,13 +410,11 @@
         const { selection, prevSelection } = event
         const selectionPaths = []
         selection.forEach((item) => {
-          if (!prevSelection.has(item))
-            selectionPaths.push(item.getPath().slice(2))
+          if (!prevSelection.has(item)) selectionPaths.push(item.getPath().slice(2))
         })
         const deselectionPaths = []
         prevSelection.forEach((item) => {
-          if (!selection.has(item))
-            deselectionPaths.push(item.getPath().slice(2))
+          if (!selection.has(item)) deselectionPaths.push(item.getPath().slice(2))
         })
         client.send('selectionChanged', {
           selection: selectionPaths,
