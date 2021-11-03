@@ -30,19 +30,7 @@
   import { RENDER_MODES, changeRenderMode } from '../../helpers/renderModes'
   import { MEASURE_TOOLS, toggleMeasureTool } from '../../helpers/measureTools'
 
-  const {
-    Vec3,
-    Xfo,
-    Mat3,
-    GeomItem,
-    Mesh,
-    MeshProxy,
-    Lines,
-    LinesProxy,
-    Color,
-    Quat,
-    MathFunctions,
-  } = window.zeaEngine
+  import { Vec3, Xfo, Mat3, Quat, MathFunctions } from '@zeainc/zea-engine'
 
   const setCameraXfo = (camera, dir, up, duration = 400) => {
     const { renderer } = $APP_DATA
@@ -218,10 +206,7 @@
     <IconPerspView />
   </ToolbarItem>
 
-  <ToolbarItemPopup
-    isHighlighted={measureTool !== MEASURE_TOOLS.NONE}
-    title="Measure Tools"
-  >
+  <ToolbarItemPopup isHighlighted={measureTool !== MEASURE_TOOLS.NONE} title="Measure Tools">
     <IconMeasureDistance />
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
       <ToolbarItem
@@ -254,10 +239,7 @@
       </ToolbarItem>
     </div>
   </ToolbarItemPopup>
-  <ToolbarItemPopup
-    isHighlighted={mode !== RENDER_MODES.PBR}
-    title="Renderer modes"
-  >
+  <ToolbarItemPopup isHighlighted={mode !== RENDER_MODES.PBR} title="Renderer modes">
     <IconRenderModeWireframe />
 
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
@@ -268,11 +250,7 @@
       >
         <IconRenderModeWireframe />
       </ToolbarItem>
-      <ToolbarItem
-        isHighlighted={mode === RENDER_MODES.FLAT}
-        title="Flat"
-        on:click={handleChangeRenderModeFlat}
-      >
+      <ToolbarItem isHighlighted={mode === RENDER_MODES.FLAT} title="Flat" on:click={handleChangeRenderModeFlat}>
         <IconRenderModeFlat />
       </ToolbarItem>
       <ToolbarItem
@@ -296,11 +274,7 @@
       >
         <IconRenderModeShadedAndEdges />
       </ToolbarItem>
-      <ToolbarItem
-        isHighlighted={mode === RENDER_MODES.PBR}
-        title="PBR"
-        on:click={handleChangeRenderModePBR}
-      >
+      <ToolbarItem isHighlighted={mode === RENDER_MODES.PBR} title="PBR" on:click={handleChangeRenderModePBR}>
         <IconRenderModePBR />
       </ToolbarItem>
     </div>

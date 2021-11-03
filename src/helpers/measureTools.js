@@ -1,12 +1,7 @@
 import { APP_DATA } from '../stores/appData'
 import { get } from 'svelte/store'
 
-const {
-  MeasureDistanceTool,
-  MeasureRadiusTool,
-  MeasureAngleTool,
-  MeasureCenterDistancesTool,
-} = window.zeaUx
+import { MeasureDistanceTool, MeasureRadiusTool, MeasureAngleTool, MeasureCenterDistancesTool } from '@zeainc/zea-ux'
 
 // ////////////////////////////////////////
 // Render Modes
@@ -33,16 +28,12 @@ const setupMeasurementTools = (toolManager, appData) => {
   toolManager.registerTool('measureDistanceTool', measureDistanceTool)
   toolManager.registerTool('measureRadiusTool', measureRadiusTool)
   toolManager.registerTool('measureAngleTool', measureAngleTool)
-  toolManager.registerTool(
-    'measureCenterDistancesTool',
-    measureCenterDistancesTool
-  )
+  toolManager.registerTool('measureCenterDistancesTool', measureCenterDistancesTool)
 }
 
 const toggleMeasureTool = (index) => {
   if (mode == index) {
-    if (index != MEASURE_TOOLS.NONE)
-      return toggleMeasureTool(MEASURE_TOOLS.NONE)
+    if (index != MEASURE_TOOLS.NONE) return toggleMeasureTool(MEASURE_TOOLS.NONE)
   }
 
   const { toolManager } = get(APP_DATA)

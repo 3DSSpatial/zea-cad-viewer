@@ -1,6 +1,5 @@
+import { EventEmitter } from '@zeainc/zea-engine'
 const createClient = () => {
-  const { EventEmitter } = window.zeaEngine
-
   class ChannelMessenger extends EventEmitter {
     constructor() {
       super()

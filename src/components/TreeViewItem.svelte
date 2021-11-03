@@ -5,8 +5,10 @@
   import IconEyeOff from '../components/icons/IconEyeOff.svelte'
   import IconChevronDown from '../components/icons/IconChevronDown.svelte'
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
-  const { CADBody } = window.zeaCad
-  const { TreeItem, InstanceItem } = window.zeaEngine
+
+  import { TreeItem, InstanceItem } from '@zeainc/zea-engine'
+  import { CADBody } from '@zeainc/zea-cad'
+  import { ParameterValueChange } from '@zeainc/zea-ux'
 
   export let item
   export let selectionManager = null
@@ -58,8 +60,6 @@
       highlighted = item.isHighlighted()
 
       if (highlighted && 'getHighlight' in item) {
-        const { Color } = globalThis.zeaEngine
-
         const itemHighlightColor = item.getHighlight()
         const bgColor = itemHighlightColor.lerp(new Color(0.75, 0.75, 0.75, 0), 0.5)
 
@@ -84,7 +84,6 @@
     visible = !visibleParam.getValue()
 
     if (undoRedoManager) {
-      const { ParameterValueChange } = globalThis.zeaUx
       const change = new ParameterValueChange(visibleParam, visible)
       undoRedoManager.addChange(change)
       return
@@ -114,10 +113,6 @@
   const initItem = () => {
     if (!item) {
       return
-    }
-
-    if (!globalThis.zeaEngine) {
-      throw new Error('`zeaEngine` is missing from the `globalThis` property. This component requires it.')
     }
 
     // This reference to the element is added so the component can navigate

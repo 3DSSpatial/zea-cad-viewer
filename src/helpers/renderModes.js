@@ -1,7 +1,7 @@
 import { APP_DATA } from '../stores/appData'
 import { get } from 'svelte/store'
 
-const {
+import {
   Vec3,
   Xfo,
   Mat3,
@@ -13,7 +13,7 @@ const {
   Color,
   Quat,
   MathFunctions,
-} = window.zeaEngine
+} from '@zeainc/zea-engine'
 
 // ////////////////////////////////////////
 // Render Modes
@@ -89,10 +89,7 @@ const handleChangeRenderModeFlatWhite = (pub = true) => {
   const { assets, scene, renderer, session } = $APP_DATA
   renderer.outlineThickness = 1
   renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-  const backgroundColor = scene
-    .getSettings()
-    .getParameter('BackgroundColor')
-    .getValue()
+  const backgroundColor = scene.getSettings().getParameter('BackgroundColor').getValue()
   const whiteMaterial = new Material()
   whiteMaterial.setShaderName('FlatSurfaceShader')
   whiteMaterial.getParameter('BaseColor').setValue(backgroundColor)
@@ -205,21 +202,17 @@ const handleChangeRenderModeShadedAndEdges = () => {
       if (geom instanceof Lines || geom instanceof LinesProxy) {
         item.getParameter('Visible').setValue(true)
       }
-      createAndAssignMaterial(
-        item,
-        RENDER_MODES.SHADED_AND_EDGES,
-        (newMaterial) => {
-          newMaterial.setName('ShadedAndEdges')
-          const shaderName = newMaterial.getShaderName()
-          if (shaderName == 'LinesShader') {
-            if (newMaterial.hasParameter('OccludedStippleValue')) {
-              newMaterial.getParameter('OccludedStippleValue').setValue(1)
-            }
-          } else {
-            newMaterial.setShaderName('SimpleSurfaceShader')
+      createAndAssignMaterial(item, RENDER_MODES.SHADED_AND_EDGES, (newMaterial) => {
+        newMaterial.setName('ShadedAndEdges')
+        const shaderName = newMaterial.getShaderName()
+        if (shaderName == 'LinesShader') {
+          if (newMaterial.hasParameter('OccludedStippleValue')) {
+            newMaterial.getParameter('OccludedStippleValue').setValue(1)
           }
+        } else {
+          newMaterial.setShaderName('SimpleSurfaceShader')
         }
-      )
+      })
     }
   })
   mode = RENDER_MODES.SHADED_AND_EDGES

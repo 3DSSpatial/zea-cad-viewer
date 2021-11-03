@@ -25,7 +25,7 @@
   import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
   import { setupMeasurementTools } from '../helpers/measureTools'
 
-  const {
+  import {
     Color,
     Vec3,
     Xfo,
@@ -38,11 +38,11 @@
     InstanceItem,
     CameraManipulator,
     AssetLoadContext,
-  } = window.zeaEngine
-  const { CADAsset, CADBody, CADPart } = window.zeaCad
-  const { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } = window.zeaUx
+  } from '@zeainc/zea-engine'
+  import { CADAsset, CADBody, CADPart } from '@zeainc/zea-cad'
+  import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
 
-  const { GLTFAsset } = gltfLoader
+  import { GLTFAsset } from '@zeainc/gltf-loader'
 
   let canvas
   let fpsContainer
