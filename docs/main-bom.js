@@ -38,13 +38,21 @@ const buildPartMapping = (modelStructure) => {
 const selectionChanged = (selection, deselection) => {
   deselection.forEach((path) => {
     const partNumber = pathMapping[path]
-    if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
-    partSelCounts[partNumber]--
+    if (partNumber) {
+      if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
+      partSelCounts[partNumber]--
+    } else {
+      console.warn('Unable to resolve selection path:', path)
+    }
   })
   selection.forEach((path) => {
     const partNumber = pathMapping[path]
-    if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
-    partSelCounts[partNumber]++
+    if (partNumber) {
+      if (!(partNumber in partSelCounts)) partSelCounts[partNumber] = 0
+      partSelCounts[partNumber]++
+    } else {
+      console.warn('Unable to resolve selection path:', path)
+    }
   })
   for (let partNumber in partSelCounts) {
     if (partSelCounts[partNumber] > 0) {
