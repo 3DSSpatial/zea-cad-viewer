@@ -58,6 +58,9 @@
   const filterItemSelection = (item) => {
     // Propagate selections up from the edges and surfaces up to
     // the part body or the instanced body
+    // Note: in some use cases, like a parts catalog, we want to
+    // propagate selection up to the part level.
+    // while in a PLM scenario, we want to pick bodies.
     while (
       item &&
       !(item instanceof CADBody) &&
@@ -401,17 +404,40 @@
         }
       })
 
+      const findCADPart = (item) => {
+        // Propagate selections up from the edges and surfaces up to the CADPart
+        while (item && !(item instanceof CADPart)) {
+          item = item.getOwner()
+        }
+        return item
+      }
+
       $selectionManager.on('selectionChanged', (event) => {
         if (recievingSelectionnChange) return
         const { selection, prevSelection } = event
         const selectionPaths = []
         selection.forEach((item) => {
-          if (!prevSelection.has(item)) selectionPaths.push(item.getPath().slice(2))
+          if (!prevSelection.has(item)) {
+            const part = findCADPart(item)
+            if (part) {
+              // remove the 'root', 'AssetName' part of the path.
+              const path = part.getPath().slice(2)
+              selectionPaths.push(path)
+            }
+          }
         })
         const deselectionPaths = []
         prevSelection.forEach((item) => {
-          if (!selection.has(item)) deselectionPaths.push(item.getPath().slice(2))
+          if (!selection.has(item)) {
+            const part = findCADPart(item)
+            if (part) {
+              // remove the 'root', 'AssetName' part of the path.
+              const path = part.getPath().slice(2)
+              deselectionPaths.push(path)
+            }
+          }
         })
+        console.log(selectionPaths, deselectionPaths)
         client.send('selectionChanged', {
           selection: selectionPaths,
           deselection: deselectionPaths,
