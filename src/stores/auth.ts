@@ -21,9 +21,7 @@ let cachedAuth0Client: Auth0Client
 let cachedCurrentUser: User
 
 const authClient = readable<Auth0Client>(null, (set) => {
-  console.info(
-    'Subscribers went from zero to one in `authClient` readable store.'
-  )
+  console.info('Subscribers went from zero to one in `authClient` readable store.')
 
   if (cachedAuth0Client) {
     set(cachedAuth0Client)
@@ -36,35 +34,30 @@ const authClient = readable<Auth0Client>(null, (set) => {
   })
 
   return () => {
-    console.info(
-      'Subscribers went from one to zero in `authClient` readable store.'
-    )
+    console.info('Subscribers went from one to zero in `authClient` readable store.')
   }
 })
 
-const currentUser = derived<typeof authClient, User>(
-  authClient,
-  async ($authClient, set) => {
-    if (cachedCurrentUser) {
-      set(cachedCurrentUser)
-      return
-    }
+const currentUser = derived<typeof authClient, User>(authClient, ($authClient, set) => {
+  if (cachedCurrentUser) {
+    set(cachedCurrentUser)
+    return
+  }
 
-    if (!$authClient) {
-      return
-    }
+  if (!$authClient) {
+    return
+  }
 
-    const isAuthenticated = await $authClient.isAuthenticated()
-
+  $authClient.isAuthenticated().then((isAuthenticated) => {
     if (!isAuthenticated) {
       return
     }
 
-    const user = await $authClient.getUser()
-
-    cachedCurrentUser = user
-    set(user)
-  }
-)
+    $authClient.getUser().then((user) => {
+      cachedCurrentUser = user
+      set(user)
+    })
+  })
+})
 
 export { authClient, currentUser }
