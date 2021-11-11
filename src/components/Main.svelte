@@ -118,16 +118,16 @@
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
     if (!SystemDesc.isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
       const envMap = new EnvMap('envMap')
-      envMap.getParameter('FilePath').setValue('data/StudioG.zenv')
-      envMap.getParameter('HeadLightMode').setValue(true)
-      $scene.getSettings().getParameter('EnvMap').setValue(envMap)
+      envMap.load('data/StudioG.zenv')
+      envMap.headlightModeParam.value = true
+      $scene.envMapParam.value = envMap
     }
 
     renderer.outlineThickness = 1
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     // $scene.setupGrid(10, 10)
-    $scene.getSettings().getParameter('BackgroundColor').setValue(new Color(0.85, 0.85, 0.85, 1))
+    renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85, 1)
     renderer.setScene($scene)
 
     const appData = {}
