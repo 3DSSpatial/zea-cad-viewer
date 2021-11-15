@@ -1,6 +1,8 @@
 <script>
   import { beforeUpdate } from 'svelte'
   import TreeViewItem from './TreeViewItem.svelte'
+  import { TreeItem } from '@zeainc/zea-engine'
+  import { CADBody } from '@zeainc/zea-cad'
 
   let treeEl
   export let rootTreeItems
@@ -42,11 +44,7 @@
       const selectedItems = selectionManager.getSelection()
       const newSelection = new Set()
       Array.from(selectedItems).forEach((item) => {
-        if (
-          item instanceof window.zeaEngine.TreeItem &&
-          item.getNumChildren() > 0 &&
-          !(item instanceof window.zeaCad.CADBody)
-        )
+        if (item instanceof TreeItem && item.getNumChildren() > 0 && !(item instanceof CADBody))
           newSelection.add(item.getChild(0))
       })
       if (newSelection.size > 0) {
@@ -82,8 +80,7 @@
       const newSelection = new Set()
       Array.from(selectedItems).forEach((item) => {
         const index = item.getOwner().getChildIndex(item)
-        if (index < item.getOwner().getNumChildren() - 1)
-          newSelection.add(item.getOwner().getChild(index + 1))
+        if (index < item.getOwner().getNumChildren() - 1) newSelection.add(item.getOwner().getChild(index + 1))
         else {
           const indexinOwner = item.getOwner().getChildIndex(item)
           if (item.getOwner().getNumChildren() > indexinOwner + 1)
@@ -138,11 +135,6 @@
 
 <div bind:this={treeEl} class="TreeView min-w-max noselect">
   {#each rootTreeItems as item, i}
-    <TreeViewItem
-      {item}
-      {selectionManager}
-      {undoRedoManager}
-      bind:this={childComponents[i]}
-    />
+    <TreeViewItem {item} {selectionManager} {undoRedoManager} bind:this={childComponents[i]} />
   {/each}
 </div>

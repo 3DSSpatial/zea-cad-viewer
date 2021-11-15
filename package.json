@@ -1,8 +1,14 @@
 {
   "name": "zea-cloud-cad-viewer",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "@zeainc/gltf-loader": "^4",
+    "@zeainc/zea-cad": "^4.0.1",
+    "@zeainc/zea-engine": "^4",
+    "@zeainc/zea-ux": "^4"
+  },
   "devDependencies": {
+    "@auth0/auth0-spa-js": "^1.6.5",
     "@babel/core": "^7.13.1",
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-json": "^4.1.0",
@@ -11,7 +17,6 @@
     "@roxi/routify": "^2.15.1",
     "@tsconfig/svelte": "^1.0.0",
     "@zeainc/zea-cloud-sdk-web": "^1.0.0-0",
-    "@auth0/auth0-spa-js": "^1.6.5",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.2",
     "cssnano": "^4.1.10",

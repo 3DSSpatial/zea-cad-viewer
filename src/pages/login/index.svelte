@@ -4,6 +4,7 @@
 
   import { auth } from '../../helpers/auth.js'
   import { getRandomString } from '../../helpers/misc.js'
+  import { Color } from '@zeainc/zea-engine'
 
   const urlParams = new URLSearchParams(window.location.search)
   const embeddedMode = urlParams.has('embedded')
@@ -12,7 +13,7 @@
   let shouldShowLayout
   let submitted
   let usernameEl
-  const getRandomRoomId = ()=>{
+  const getRandomRoomId = () => {
     return `${getRandomString(3)}-${getRandomString(3)}-${getRandomString(3)}`
   }
   let roomId = urlParams.has('roomId') ? urlParams.get('roomId') : getRandomRoomId()
@@ -58,16 +59,14 @@
   }
 
   const handleSubmit = async () => {
-    const { Color } = window.zeaEngine
     const userData = {
       color: Color.random().toHex(),
       firstName: formFields.username,
       id: userId,
       lastName: '',
       password: formFields.password,
-      username: formFields.username
+      username: formFields.username,
     }
-
 
     try {
       await auth.setUserData(userData)
@@ -102,20 +101,20 @@
 </script>
 
 {#if shouldShowLayout}
-  <div
-    class="bg-background min-h-full flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8"
-  >
+  <div class="bg-background min-h-full flex items-center justify-center py-12 px-4 text-foreground sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
       <h2 class="mt-6 text-center text-3xl font-extrabold">Zea Svelte Template</h2>
-      <p class="mt-6 text-center">This is an MIT open sourced template application that can be used to build your own custom applications.</p>
+      <p class="mt-6 text-center">
+        This is an MIT open sourced template application that can be used to build your own custom applications.
+      </p>
 
-      <form
-        class="mt-8 space-y-6"
-        on:submit|preventDefault|stopPropagation={handleSubmit}
-      >
+      <form class="mt-8 space-y-6" on:submit|preventDefault|stopPropagation={handleSubmit}>
         <div class="rounded-md shadow-sm">
           <p class="mt-6 text-center">Enter a username and the password to start the app.</p>
-          <p class="text-center">Note: the defualt password is 'zea' and can be modified in 'auth.js' or you can integrate an authentication service like Auth0.</p>
+          <p class="text-center">
+            Note: the defualt password is 'zea' and can be modified in 'auth.js' or you can integrate an authentication
+            service like Auth0.
+          </p>
           <div class="mb-2">
             <input
               autocomplete="off"

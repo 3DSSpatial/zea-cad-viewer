@@ -11,7 +11,7 @@
   import StringParameterWidget from './StringParameterWidget.svelte'
   import ColorParameterWidget from './ColorParameterWidget.svelte'
 
-  const { BooleanParameter, NumberParameter, StringParameter, ColorParameter } = window.zeaEngine
+  import { BooleanParameter, NumberParameter, StringParameter, ColorParameter } from '@zeainc/zea-engine'
 
   componentRegistry.registerComponent((parameter) => {
     return parameter instanceof BooleanParameter

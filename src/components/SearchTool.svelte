@@ -3,7 +3,7 @@
 
   import { scene } from '../stores/scene.js'
 
-  const { Color, Material, TreeItem, GeomItem, GridTreeItem } = window.zeaEngine
+  import { Color, Material, TreeItem, GeomItem, GridTreeItem } from '@zeainc/zea-engine'
 
   let searchInputEl
   let searchResultsEl
@@ -12,9 +12,7 @@
   const filteredItemsSet = new Set()
   const filteredItemMaterial = new Material()
   filteredItemMaterial.setShaderName('FlatSurfaceShader')
-  filteredItemMaterial
-    .getParameter('BaseColor')
-    .setValue(new Color(0, 0, 1, 0.1))
+  filteredItemMaterial.getParameter('BaseColor').setValue(new Color(0, 0, 1, 0.1))
 
   const filteredItemMaterials = {}
   const matchedItemsSet = new Set()
@@ -44,8 +42,7 @@
       if (value.length >= 2) {
         const re = new RegExp(value, 'i')
         $scene.getRoot().traverse((item) => {
-          if (item instanceof GridTreeItem || !(item instanceof TreeItem))
-            return false
+          if (item instanceof GridTreeItem || !(item instanceof TreeItem)) return false
           if (re.test(item.getName())) {
             const listItem = document.createElement('li')
             listItem.classList.add('truncate')
@@ -86,12 +83,7 @@
 
 <div class="h-full w-full px-3">
   <form on:submit|preventDefault={handleSubmit}>
-    <input
-      bind:this={searchInputEl}
-      bind:value
-      class="rounded w-full text-black px-1"
-      type="search"
-    />
+    <input bind:this={searchInputEl} bind:value class="rounded w-full text-black px-1" type="search" />
   </form>
   <ul bind:this={searchResultsEl} class="py-3" id="searchResults" />
 </div>
