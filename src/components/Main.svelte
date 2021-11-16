@@ -507,7 +507,9 @@
 
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
-  <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
+  {#if !fileLoaded}
+    <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
+  {/if}
 
   <div class="absolute bottom-10 w-full flex justify-center">
     <Toolbar />
