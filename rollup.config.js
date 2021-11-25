@@ -67,7 +67,7 @@ export default {
     // resolve matching modules from current working directory
     resolve({
       browser: true,
-      dedupe: (importee) => !!importee.match(/svelte(\/|$)/),
+      dedupe: (importee) => !!importee.match(/svelte(\/|$)/) && !!importee.match(/@zeainc(\/|$)/),
     }),
     commonjs(),
     typescript({

@@ -4,8 +4,8 @@
   "dependencies": {
     "@zeainc/gltf-loader": "^4",
     "@zeainc/zea-cad": "^4.0.1",
-    "@zeainc/zea-engine": "^4",
-    "@zeainc/zea-ux": "^4"
+    "@zeainc/zea-engine": "^4.0.1",
+    "@zeainc/zea-ux": "^4.0.1"
   },
   "devDependencies": {
     "@auth0/auth0-spa-js": "^1.6.5",
