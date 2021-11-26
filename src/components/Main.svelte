@@ -76,6 +76,7 @@
     const asset = new CADAsset()
     const context = new AssetLoadContext()
     context.resources = resources
+    context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
       renderer.frameAll()
     })
