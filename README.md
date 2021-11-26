@@ -2,6 +2,10 @@
 
 The zea-cad-viewer is an embeddable web application for viewing CAD data. It is intended to be integrated into host applications that might need to support displaying 3D cad data in the browser.
 
+-![PressRink](docs/images/PressRink.png)
+
+> https://cad-viewer-staging.zea.live/?zcad=data/PressRink.zcad
+
 # Processing CAD files using the zea-cloud API.
 
 zcad file can be produced using a few different mechanisims. The Zea Cloud Hello world project shows you how to use the Cloud APIs to process files and download them to your system, or directly launch the viewer.
@@ -27,10 +31,7 @@ To test zea-cad-viewer embedded on your system, and follow the following steps.
 Add an iframe tag to your application, and specify the URL of the viewer.
 
 ```html
-<iframe
-  id="zea-cad-viewer"
-  src="https://cad-viewer-staging.zea.live/?embedded"
-></iframe>
+<iframe id="zea-cad-viewer" src="https://cad-viewer-staging.zea.live/?embedded"></iframe>
 ```
 
 # Connect the Channel Messenger.
