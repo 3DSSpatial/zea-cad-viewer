@@ -32,7 +32,7 @@
 
   import { Vec3, Xfo, Mat3, Quat, MathFunctions } from '@zeainc/zea-engine'
 
-  const setCameraXfo = (camera, dir, up, duration = 400) => {
+  const setCameraXfo = (camera, dir, up, ortho, duration = 400) => {
     const { renderer } = $APP_DATA
     const startTarget = camera.getTargetPosition()
     const startDist = camera.getFocalDistance()
@@ -61,7 +61,7 @@
 
     const count = Math.round(duration / 20) // each step is 20ms
     let id
-    let i = 0
+    let i = 1
     const applyMovement = () => {
       const lerpValue = i / count
 
@@ -78,6 +78,8 @@
       xfo.tr = target.subtract(newDir.scale(dist))
 
       camera.getParameter('GlobalXfo').setValue(xfo)
+      if (ortho) camera.setIsOrthographic(lerpValue)
+      else camera.setIsOrthographic(1 - lerpValue)
       i++
       if (i <= count) {
         id = setTimeout(applyMovement, 20)
@@ -94,46 +96,39 @@
   const handleChangeViewFront = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 1, 0), new Vec3(0, 0, 1))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(0, 1, 0), new Vec3(0, 0, 1), true)
   }
   const handleChangeViewBack = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, -1, 0), new Vec3(0, 0, 1))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(0, -1, 0), new Vec3(0, 0, 1), true)
   }
   const handleChangeViewTop = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 0, -1), new Vec3(0, 1, 0))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(0, 0, -1), new Vec3(0, 1, 0), true)
   }
   const handleChangeViewBottom = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 0, 1), new Vec3(0, -1, 0))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(0, 0, 1), new Vec3(0, -1, 0), true)
   }
   const handleChangeViewLeft = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(1, 0, 0), new Vec3(0, 0, 1))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(1, 0, 0), new Vec3(0, 0, 1), true)
   }
   const handleChangeViewRight = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(-1, 0, 0), new Vec3(0, 0, 1))
-    // camera.setIsOrthographic(1.0)
+    setCameraXfo(camera, new Vec3(-1, 0, 0), new Vec3(0, 0, 1), true)
   }
   const handleChangeViewPerspective = () => {
     const { renderer } = $APP_DATA
     const camera = renderer.getViewport().getCamera()
     const dir = new Vec3(-1, 1, -1)
     dir.normalizeInPlace()
-    setCameraXfo(camera, dir, new Vec3(0, 0, 1))
-    camera.setIsOrthographic(0.0)
+    setCameraXfo(camera, dir, new Vec3(0, 0, 1), false)
   }
   /* }}} View handlers. */
 
