@@ -38,8 +38,9 @@
     InstanceItem,
     CameraManipulator,
     AssetLoadContext,
+    GeomItem,
   } from '@zeainc/zea-engine'
-  import { CADAsset, CADBody, CADPart } from '@zeainc/zea-cad'
+  import { CADAsset, CADBody, CADPart, PMIItem } from '@zeainc/zea-cad'
   import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
 
   import { GLTFAsset } from '@zeainc/gltf-loader'
@@ -78,6 +79,22 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
+      // The following is a quick hack to remove the black outlines around PMI text.
+      // We do not crete ourlines around transparent geometries, so by forcing
+      // the PMI items sub-trees to be considered transparent, it moves them into
+      // the GLTransparentPass, which does not draw outlines. this cleans up
+      // the rendering considerably.
+      asset.traverse((item) => {
+        if (item instanceof PMIItem) {
+          item.traverse((item) => {
+            if (item instanceof GeomItem) {
+              item.materialParam.value.__isTransparent = true
+            }
+          })
+          return false
+        }
+        return true
+      })
       renderer.frameAll()
     })
     $assets.addChild(asset)
