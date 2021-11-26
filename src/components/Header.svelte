@@ -2,7 +2,7 @@
   import { redirect } from '@roxi/routify'
   import { onMount } from 'svelte'
 
-  import { Quat, Vec3, CameraManipulator } from '@zeainc/zea-engine'
+  import { Quat, Vec3, CameraManipulator, Color } from '@zeainc/zea-engine'
   import { ToolManager } from '@zeainc/zea-ux'
 
   import Button from './Button.svelte'
@@ -29,6 +29,8 @@
   let cameraManipulator
   let isTumblerEnabled = true
   let isTurnTableEnabled = false
+  let isLightViewportEnabled = true
+  let isDarkViewportEnabled = false
   let isSelectionEnabled = false
   let isTransformHandlesEnabled = false
   let renderer
@@ -89,6 +91,17 @@
     }, 20)
     isTurnTableEnabled = true
     isTumblerEnabled = false
+  }
+
+  const handleLightViewportEnabled = () => {
+    renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85)
+    isLightViewportEnabled = true
+    isDarkViewportEnabled = false
+  }
+  const handleDarkViewportEnabled = () => {
+    renderer.getViewport().backgroundColorParam.value = new Color(0.25, 0.25, 0.25)
+    isLightViewportEnabled = false
+    isDarkViewportEnabled = true
   }
 
   const handleMenuSelectionChange = () => {
@@ -286,6 +299,16 @@
               label="Camera Mode: Tumbler"
               bind:checked={isTumblerEnabled}
               on:change={handleTumblerEnabled}
+            />
+            <MenuItemToggle
+              label="Viewport Background: Light"
+              bind:checked={isLightViewportEnabled}
+              on:change={handleLightViewportEnabled}
+            />
+            <MenuItemToggle
+              label="Viewport Background: Dark"
+              bind:checked={isDarkViewportEnabled}
+              on:change={handleDarkViewportEnabled}
             />
           </Menu>
         </MenuBarItem>
