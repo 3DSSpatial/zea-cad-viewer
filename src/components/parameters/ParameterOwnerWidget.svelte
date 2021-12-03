@@ -1,5 +1,6 @@
 <script>
-  import { onMount, afterUpdate } from 'svelte'
+  import { afterUpdate } from 'svelte'
+
   export let parameterOwner
   let items = []
 
@@ -60,15 +61,19 @@
   })
 </script>
 
-<div
-  class="ParameterOwnerWidget grid grid-cols-2 absolute w-120 top-0 right-0 overflow-hidden pointer-events-none space-y-2 p-2 "
->
+<div class="absolute top-0 right-0 p-2 overflow-hidden pointer-events-none ParameterOwnerWidget grid w-120 space-y-2 ">
   {#each items as item (item.index)}
-    <div class="text-black flex items-center mr-2 justify-end">
-      <span>{item.parameter.getName()}</span>
+    <div class="flex items-center justify-end mr-2 text-black">
+      {item.parameter.getName()}
     </div>
     <div class="pointer-events-auto">
       <svelte:component this={item.component} parameter={item.parameter} />
     </div>
   {/each}
 </div>
+
+<style>
+  .ParameterOwnerWidget {
+    grid-template-columns: 1fr 150px;
+  }
+</style>

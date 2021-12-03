@@ -4,8 +4,7 @@
   const remap = (value, start1, end1, start2, end2) => {
     return start2 + (end2 - start2) * ((value - start1) / (end1 - start1))
   }
-  const round = (n, decimals = 6) =>
-    Number(Math.round(Number(`${n}e${decimals}`)) + `e-${decimals}`)
+  const round = (n, decimals = 6) => Number(Math.round(Number(`${n}e${decimals}`)) + `e-${decimals}`)
 
   // Note: Sliders cannot handle fractional values, but we often ned
   // to display sliders that range between 0 ... 1. So we remap
@@ -30,9 +29,7 @@
 
   const handleSliderChange = (event) => {
     sliderValue = event.target.valueAsNumber
-    paramValue = round(
-      Math.round(remap(sliderValue, UI_MIN, UI_MAX, min, max) / step) * step
-    )
+    paramValue = round(Math.round(remap(sliderValue, UI_MIN, UI_MAX, min, max) / step) * step)
 
     sliderChanging = true
     parameter.setValue(paramValue)
@@ -60,14 +57,7 @@
   })
 </script>
 
-<input
-  max={UI_MAX}
-  min={UI_MIN}
-  on:input={handleSliderChange}
-  type="range"
-  step={sliderStep}
-  value={sliderValue}
-/>
+<input max={UI_MAX} min={UI_MIN} on:input={handleSliderChange} type="range" step={sliderStep} value={sliderValue} />
 <input
   max={UI_MAX}
   min={UI_MIN}
@@ -75,5 +65,5 @@
   {step}
   type="number"
   value={paramValue}
-  class="text-black rounded p-1"
+  class="RangedNumberParameterWidget text-black rounded p-1"
 />

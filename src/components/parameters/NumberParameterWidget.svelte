@@ -27,5 +27,5 @@
   {step}
   type="number"
   value={paramValue}
-  class="text-black rounded p-1"
+  class="NumberParameterWidget text-black rounded p-1 w-full"
 />
