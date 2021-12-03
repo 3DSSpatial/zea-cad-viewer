@@ -62,11 +62,10 @@
     // Note: in some use cases, like a parts catalog, we want to
     // propagate selection up to the part level.
     // while in a PLM scenario, we want to pick bodies.
-    while (
-      item &&
-      !(item instanceof CADBody) &&
-      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
-    ) {
+    while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
+      item = item.getOwner()
+    }
+    if (item.getOwner() instanceof InstanceItem) {
       item = item.getOwner()
     }
     return item
