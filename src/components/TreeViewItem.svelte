@@ -55,6 +55,42 @@
   let unsubHighlightChanged
   let unsubVisibilityChanged
 
+  const getItemNameAndTooltip = (treeItem) => {
+    let name
+    const displayNameParam = treeItem.getParameter('DisplayName')
+    if (displayNameParam) {
+      name = displayNameParam.getValue()
+    } else name = treeItem.getName()
+
+    if (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1) {
+      const referenceItem = treeItem.getChild(0)
+      if (name == '') {
+        const displayNameParam = referenceItem.getParameter('DisplayName')
+        if (displayNameParam) {
+          name = displayNameParam.getValue()
+        } else name = referenceItem.getName()
+      }
+
+      return {
+        name: name + ` (Instance of ${referenceItem.getClassName()})`,
+        tooltip: `(Instance of ${referenceItem.getClassName()})`,
+      }
+    } else {
+      return {
+        name: name + ` (${treeItem.getClassName()})`,
+        tooltip: `(${treeItem.getClassName()})`,
+      }
+    }
+  }
+  const getChildren = (treeItem) => {
+    if (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1) {
+      const referenceItem = treeItem.getChild(0)
+      return referenceItem.getChildren()
+    } else {
+      return treeItem.getChildren()
+    }
+  }
+
   const updateHighlight = () => {
     if (item && 'isHighlighted' in item) {
       highlighted = item.isHighlighted()
@@ -104,6 +140,9 @@
     }
 
     selectionManager.toggleItemSelection(item, !event.ctrlKey)
+
+    const selection = selectionManager.getSelection()
+    item.setSelected(selection.has(item))
   }
 
   const forceRender = () => {
@@ -196,14 +235,14 @@
           : 'transparent'};"
         on:click={handleItemClick}
       >
-        {item.getName()}
+        {getItemNameAndTooltip(item).name}
       </span>
     </div>
 
     {#if hasChildren && isExpanded}
       <div class="TreeItem__body ml-4 pl-4 md:ml-3 md:pl-3 border-dotted border-l-2 md:border-l">
         {#if isTreeItem}
-          {#each item.getChildren() as childItem, i}
+          {#each getChildren(item) as childItem, i}
             <svelte:self item={childItem} {selectionManager} {undoRedoManager} bind:this={childComponents[i]} />
           {/each}
         {/if}
