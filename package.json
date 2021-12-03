@@ -2,10 +2,10 @@
   "name": "zea-cloud-cad-viewer",
   "version": "0.0.1",
   "dependencies": {
-    "@zeainc/gltf-loader": "^4",
-    "@zeainc/zea-cad": "^4.0.1",
-    "@zeainc/zea-engine": "^4.0.1",
-    "@zeainc/zea-ux": "^4.0.1"
+    "@zeainc/gltf-loader": "^4.0.4-next.0",
+    "@zeainc/zea-cad": "^4.0.2-next.2",
+    "@zeainc/zea-engine": "^4.0.2-next.0",
+    "@zeainc/zea-ux": "^4.0.2-next.1"
   },
   "devDependencies": {
     "@auth0/auth0-spa-js": "^1.6.5",

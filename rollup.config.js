@@ -67,7 +67,17 @@ export default {
     // resolve matching modules from current working directory
     resolve({
       browser: true,
-      dedupe: (importee) => !!importee.match(/svelte(\/|$)/) && !!importee.match(/@zeainc(\/|$)/),
+      // dedupe: (importee) => !!importee.match(/svelte(\/|$)/) && !!importee.match(/@zeainc(\/|$)/),
+      dedupe: [
+        'svelte',
+        'svelte-dev-helper',
+        'svelte-hmr',
+        'svelte-loader',
+        'svelte-preprocess',
+        'svelte-accessible-dialog',
+        'svelte-check',
+        '@zeainc',
+      ],
     }),
     commonjs(),
     typescript({
