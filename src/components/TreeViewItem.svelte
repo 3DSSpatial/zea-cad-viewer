@@ -34,7 +34,7 @@
     if (path.length > 1) {
       const childIndex = item.getChildIndex(path[1])
       const treeViewItem = childComponents[childIndex]
-      treeViewItem.expandTree(path.slice(1))
+      if (treeViewItem) treeViewItem.expandTree(path.slice(1))
     } else {
       // causes the element to be always at the top of the view.
       el.scrollIntoView({

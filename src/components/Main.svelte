@@ -62,11 +62,10 @@
     // Note: in some use cases, like a parts catalog, we want to
     // propagate selection up to the part level.
     // while in a PLM scenario, we want to pick bodies.
-    while (
-      item &&
-      !(item instanceof CADBody) &&
-      !(item instanceof InstanceItem && item.getSrcTree() instanceof CADBody)
-    ) {
+    while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
+      item = item.getOwner()
+    }
+    if (item.getOwner() instanceof InstanceItem) {
       item = item.getOwner()
     }
     return item
@@ -79,6 +78,20 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
+      // Temporary fix until the following fix is deployed:
+      //  https://github.com/ZeaInc/zea-engine/pull/573
+
+      const materials = asset.getMaterialLibrary().getMaterials()
+      materials.forEach((material) => {
+        // Convert linear space values to gamma space values.
+        // The shaders assume gamma space values, to convert to linear at render time.
+        const baseColorParam = material.getParameter('BaseColor')
+        if (baseColorParam) {
+          const baseColor = baseColorParam.value.toGamma()
+          baseColorParam.setValue(baseColor)
+        }
+      })
+
       // The following is a quick hack to remove the black outlines around PMI text.
       // We do not crete ourlines around transparent geometries, so by forcing
       // the PMI items sub-trees to be considered transparent, it moves them into
