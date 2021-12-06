@@ -7,12 +7,19 @@
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
 
   import { TreeItem, InstanceItem, Color } from '@zeainc/zea-engine'
-  import { CADBody } from '@zeainc/zea-cad'
+  import { CADBody, CADAssembly, CADPart } from '@zeainc/zea-cad'
   import { ParameterValueChange } from '@zeainc/zea-ux'
 
   export let item
   export let selectionManager = null
   export let undoRedoManager = null
+  
+  const isInstanceItem = (treeItem) => {
+    return (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1 && (
+      treeItem.getChild(0) instanceof CADAssembly || treeItem.getChild(0) instanceof CADPart)
+    )
+  }
+
   let isExpanded = false
   let highlighted = false
   let visible = false
@@ -21,6 +28,12 @@
   let expandPath
   export function expandTree(path) {
     if (path[path.length - 1] == item) {
+      // causes the element to be always at the top of the view.
+      el.scrollIntoView({
+        behavior: 'auto',
+        block: 'center',
+        inline: 'center',
+      })
       return
     }
     isExpanded = true
@@ -32,16 +45,22 @@
   }
   function expandSubTree(path) {
     if (path.length > 1) {
-      const childIndex = item.getChildIndex(path[1])
-      const treeViewItem = childComponents[childIndex]
-      if (treeViewItem) treeViewItem.expandTree(path.slice(1))
-    } else {
-      // causes the element to be always at the top of the view.
-      el.scrollIntoView({
-        behavior: 'auto',
-        block: 'center',
-        inline: 'center',
-      })
+      let childIndex = -1
+      let subPath
+      if (isInstanceItem(item)) {
+        childIndex = item.getChild(0).getChildIndex(path[2])
+        subPath = path.slice(2)
+      } else {
+        childIndex = item.getChildIndex(path[1])
+        subPath = path.slice(1)
+      }
+      // const  childIndex = item.getChildIndex(path[1])
+      if (childIndex != -1) {
+        const treeViewItem = childComponents[childIndex]
+        if (treeViewItem) {
+          treeViewItem.expandTree(subPath)
+        }
+      }
     }
   }
 
@@ -55,6 +74,7 @@
   let unsubHighlightChanged
   let unsubVisibilityChanged
 
+
   const getItemNameAndTooltip = (treeItem) => {
     let name
     const displayNameParam = treeItem.getParameter('DisplayName')
@@ -62,7 +82,7 @@
       name = displayNameParam.getValue()
     } else name = treeItem.getName()
 
-    if (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1) {
+    if (isInstanceItem(treeItem)) {
       const referenceItem = treeItem.getChild(0)
       if (name == '') {
         const displayNameParam = referenceItem.getParameter('DisplayName')
