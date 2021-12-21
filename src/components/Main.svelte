@@ -57,16 +57,16 @@
   let renderer
 
   const filterItemSelection = (item) => {
-    // Propagate selections up from the edges and surfaces up to
-    // the part body or the instanced body
-    // Note: in some use cases, like a parts catalog, we want to
-    // propagate selection up to the part level.
-    // while in a PLM scenario, we want to pick bodies.
-    while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
+    let srcItem = item
+    // Note: If faces and edges exist in the model, its because we
+    // want to be able to highlight/select them.
+    // For use case where only part selection is needed, this function
+    // should walk up to the part.
+    while (item && !(item instanceof PMIItem)) {
       item = item.getOwner()
     }
-    if (item.getOwner() instanceof InstanceItem) {
-      item = item.getOwner()
+    if (!item) {
+      return srcItem
     }
     return item
   }
