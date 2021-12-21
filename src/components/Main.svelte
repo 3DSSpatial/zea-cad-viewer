@@ -101,7 +101,11 @@
         if (item instanceof PMIItem) {
           item.traverse((item) => {
             if (item instanceof GeomItem) {
-              item.materialParam.value.__isTransparent = true
+              const material = item.materialParam.value
+              material.__isTransparent = true
+              if (material.getShaderName() == 'StandardSurfaceShader') {
+                material.setShaderName('FlatSurfaceShader')
+              }
             }
           })
           return false
