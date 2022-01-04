@@ -259,8 +259,12 @@
         event.stopPropagation()
       }
 
-      // Detect a right click
-      if (event.button == 0 && event.intersectionData) {
+      // Detect a single touch, or a left button click.
+      if (
+        ((event.pointerType == 'touch' && event.touches.length == 0 && event.changedTouches.length == 1) ||
+          (event.pointerType == 'mouse' && event.button == 0)) &&
+        event.intersectionData
+      ) {
         // if the selection tool is active then do nothing, as it will
         // handle single click selection.s
         const toolStack = toolManager.toolStack
@@ -278,7 +282,9 @@
             $selectionManager.deselectItems(items)
           }
         }
-      } else if (event.button == 2 && event.intersectionData) {
+      }
+      // Detect a right click
+      else if (event.button == 2 && event.intersectionData) {
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
