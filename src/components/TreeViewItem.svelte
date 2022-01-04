@@ -7,16 +7,18 @@
   import IconChevronRight from '../components/icons/IconChevronRight.svelte'
 
   import { TreeItem, InstanceItem, Color } from '@zeainc/zea-engine'
-  import { CADBody, CADAssembly, CADPart } from '@zeainc/zea-cad'
+  import { CADAssembly, CADPart } from '@zeainc/zea-cad'
   import { ParameterValueChange } from '@zeainc/zea-ux'
 
   export let item
   export let selectionManager = null
   export let undoRedoManager = null
-  
+
   const isInstanceItem = (treeItem) => {
-    return (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1 && (
-      treeItem.getChild(0) instanceof CADAssembly || treeItem.getChild(0) instanceof CADPart)
+    return (
+      treeItem instanceof InstanceItem &&
+      treeItem.getNumChildren() == 1 &&
+      (treeItem.getChild(0) instanceof CADAssembly || treeItem.getChild(0) instanceof CADPart)
     )
   }
 
@@ -73,7 +75,6 @@
   let unsubChildRemoved
   let unsubHighlightChanged
   let unsubVisibilityChanged
-
 
   const getItemNameAndTooltip = (treeItem) => {
     let name
@@ -199,11 +200,7 @@
       }
       unsubVisibilityChanged = item.on('visibilityChanged', updateVisibility)
 
-      // This code is for a special case when items are replaced in the
-      // TreeView and we don't load the component again.
-      const isBody = item instanceof CADBody
-      const isInstancedBody = item instanceof InstanceItem && item.getSrcTree() instanceof CADBody
-      hasChildren = item.getNumChildren() > 0 && !isBody && !isInstancedBody
+      hasChildren = item.getNumChildren() > 0
     }
 
     if (unsubHighlightChanged > -1) {

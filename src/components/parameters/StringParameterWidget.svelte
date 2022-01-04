@@ -20,4 +20,9 @@
   })
 </script>
 
-<input on:input={handleEditChange} value={paramValue} class="StringParameterWidget text-black rounded p-1 w-full" />
+<input
+  on:input={handleEditChange}
+  value={paramValue}
+  readonly
+  class="StringParameterWidget text-black rounded p-1 w-full"
+/>

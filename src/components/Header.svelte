@@ -272,20 +272,10 @@
 </script>
 
 {#if !embeddedMode}
-  <header class="flex gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50">
-    <button
-      class="cursor-default flex justify-center w-7 h-7"
-      on:click={handleClickMenuToggle}
-      title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
-    >
-      <span class="material-icons">
-        {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
-      </span>
-    </button>
+  <header class="gap-2 items-center px-1 sm:px-2 py-1 text-gray-200 z-50 hidden sm:flex">
+    <img class="h-6 ml-8" src="/images/logo-zea.svg" alt="logo" />
 
-    <img class="h-6" src="/images/logo-zea.svg" alt="logo" />
-
-    <div class="hidden sm:block">
+    <div>
       <MenuBar>
         <MenuBarItem label="View" let:isOpen>
           <Menu {isOpen}>
@@ -341,4 +331,13 @@
       </MenuBar>
     </div>
   </header>
+  <button
+    class="cursor-default flex justify-center rounded z-50 fixed bg-background top-1 left-1"
+    on:click={handleClickMenuToggle}
+    title="{$ui.shouldShowDrawer ? 'Close' : 'Open'} drawer"
+  >
+    <span class="material-icons">
+      {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
+    </span>
+  </button>
 {/if}

@@ -57,16 +57,16 @@
   let renderer
 
   const filterItemSelection = (item) => {
-    // Propagate selections up from the edges and surfaces up to
-    // the part body or the instanced body
-    // Note: in some use cases, like a parts catalog, we want to
-    // propagate selection up to the part level.
-    // while in a PLM scenario, we want to pick bodies.
-    while (item && !(item instanceof CADBody) && !(item instanceof PMIItem)) {
+    let srcItem = item
+    // Note: If faces and edges exist in the model, its because we
+    // want to be able to highlight/select them.
+    // For use case where only part selection is needed, this function
+    // should walk up to the part.
+    while (item && !(item instanceof PMIItem)) {
       item = item.getOwner()
     }
-    if (item.getOwner() instanceof InstanceItem) {
-      item = item.getOwner()
+    if (!item) {
+      return srcItem
     }
     return item
   }
@@ -101,7 +101,11 @@
         if (item instanceof PMIItem) {
           item.traverse((item) => {
             if (item instanceof GeomItem) {
-              item.materialParam.value.__isTransparent = true
+              const material = item.materialParam.value
+              material.__isTransparent = true
+              if (material.getShaderName() == 'StandardSurfaceShader') {
+                material.setShaderName('FlatSurfaceShader')
+              }
             }
           })
           return false
@@ -180,6 +184,9 @@
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
     cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.tumbler)
+    // Make sure a double tap is required to aim the focus.
+    cameraManipulator.aimFocusOnTouchTap = 2
+    cameraManipulator.aimFocusOnMouseClick = 2
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
@@ -252,26 +259,35 @@
         event.stopPropagation()
       }
 
-      // Detect a right click
-      if (event.button == 0 && event.intersectionData) {
+      // Detect a single touch, or a left button click.
+      if (
+        (event.pointerType == 'touch' && event.touches.length == 0 && event.changedTouches.length == 1) ||
+        (event.pointerType == 'mouse' && event.button == 0)
+      ) {
         // if the selection tool is active then do nothing, as it will
         // handle single click selection.s
         const toolStack = toolManager.toolStack
         if (toolStack[toolStack.length - 1] == selectionTool) return
 
-        // To provide a simple selection when the SelectionTool is not activated,
-        // we toggle selection on the item that is selcted.
-        const item = filterItemSelection(event.intersectionData.geomItem)
-        if (item) {
-          if (!event.shiftKey) {
-            $selectionManager.toggleItemSelection(item, !event.ctrlKey)
-          } else {
-            const items = new Set()
-            items.add(item)
-            $selectionManager.deselectItems(items)
+        if (event.intersectionData) {
+          // To provide a simple selection when the SelectionTool is not activated,
+          // we toggle selection on the item that is selcted.
+          const item = filterItemSelection(event.intersectionData.geomItem)
+          if (item) {
+            if (!event.shiftKey) {
+              $selectionManager.toggleItemSelection(item, !event.ctrlKey)
+            } else {
+              const items = new Set()
+              items.add(item)
+              $selectionManager.deselectItems(items)
+            }
           }
+        } else {
+          // $selectionManager.clearSelection()
+          $selectionManager.setSelection(new Set(), true)
         }
       } else if (event.button == 2 && event.intersectionData) {
+        // Detect a right click
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
@@ -281,6 +297,9 @@
 
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
+      if (!event.intersectionData) {
+        renderer.frameAll()
+      }
     })
     /** UX END */
 
@@ -543,7 +562,7 @@
     <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
   {/if}
 
-  <div class="absolute bottom-10 w-full flex justify-center">
+  <div class="absolute bottom-3 w-full flex justify-center">
     <Toolbar />
   </div>
 

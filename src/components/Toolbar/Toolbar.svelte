@@ -179,28 +179,32 @@
 </script>
 
 <div class="Toolbar flex gap-1" class:flex-col={orientation === 'vertical'}>
-  <ToolbarItem title="Front" on:click={handleChangeViewFront}>
-    <IconFrontView />
-  </ToolbarItem>
-  <ToolbarItem title="Back" on:click={handleChangeViewBack}>
-    <IconBackView />
-  </ToolbarItem>
-  <ToolbarItem title="Top" on:click={handleChangeViewTop}>
-    <IconTopView />
-  </ToolbarItem>
-  <ToolbarItem title="Bottom" on:click={handleChangeViewBottom}>
-    <IconBottomView />
-  </ToolbarItem>
-  <ToolbarItem title="Left" on:click={handleChangeViewLeft}>
-    <IconLeftView />
-  </ToolbarItem>
-  <ToolbarItem title="Right" on:click={handleChangeViewRight}>
-    <IconRightView />
-  </ToolbarItem>
-  <ToolbarItem title="Perspective" on:click={handleChangeViewPerspective}>
+  <ToolbarItemPopup title="CameraView">
     <IconPerspView />
-  </ToolbarItem>
-
+    <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
+      <ToolbarItem title="Front" on:click={handleChangeViewFront}>
+        <IconFrontView />
+      </ToolbarItem>
+      <ToolbarItem title="Back" on:click={handleChangeViewBack}>
+        <IconBackView />
+      </ToolbarItem>
+      <ToolbarItem title="Top" on:click={handleChangeViewTop}>
+        <IconTopView />
+      </ToolbarItem>
+      <ToolbarItem title="Bottom" on:click={handleChangeViewBottom}>
+        <IconBottomView />
+      </ToolbarItem>
+      <ToolbarItem title="Left" on:click={handleChangeViewLeft}>
+        <IconLeftView />
+      </ToolbarItem>
+      <ToolbarItem title="Right" on:click={handleChangeViewRight}>
+        <IconRightView />
+      </ToolbarItem>
+      <ToolbarItem title="Perspective" on:click={handleChangeViewPerspective}>
+        <IconPerspView />
+      </ToolbarItem>
+    </div>
+  </ToolbarItemPopup>
   <ToolbarItemPopup isHighlighted={measureTool !== MEASURE_TOOLS.NONE} title="Measure Tools">
     <IconMeasureDistance />
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
@@ -235,7 +239,7 @@
     </div>
   </ToolbarItemPopup>
   <ToolbarItemPopup isHighlighted={mode !== RENDER_MODES.PBR} title="Renderer modes">
-    <IconRenderModeWireframe />
+    <IconRenderModeShadedAndEdges />
 
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
       <ToolbarItem

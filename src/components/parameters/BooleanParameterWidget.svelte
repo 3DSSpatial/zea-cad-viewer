@@ -20,4 +20,4 @@
   })
 </script>
 
-<input on:input={handleEditChange} type="checkbox" checked={paramValue} />
+<input on:input={handleEditChange} type="checkbox" readonly checked={paramValue} />
