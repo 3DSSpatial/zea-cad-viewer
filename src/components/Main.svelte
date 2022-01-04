@@ -184,6 +184,9 @@
     /** SELECTION START */
     const cameraManipulator = renderer.getViewport().getManipulator()
     cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES.tumbler)
+    // Make sure a double tap is required to aim the focus.
+    cameraManipulator.aimFocusOnTouchTap = 2
+    cameraManipulator.aimFocusOnMouseClick = 2
     appData.cameraManipulator = cameraManipulator
     const toolManager = new ToolManager(appData)
     $selectionManager = new SelectionManager(appData, {
