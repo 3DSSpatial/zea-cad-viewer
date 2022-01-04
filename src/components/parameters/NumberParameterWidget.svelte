@@ -26,6 +26,7 @@
   on:input={handleEditChange}
   {step}
   type="number"
+  readonly
   value={paramValue}
   class="NumberParameterWidget text-black rounded p-1 w-full"
 />

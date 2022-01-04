@@ -20,9 +20,4 @@
   })
 </script>
 
-<input
-  on:input={handleEditChange}
-  type="color"
-  value={paramValue.toHex()}
-  class="text-black rounded h-full"
-/>
+<input on:input={handleEditChange} type="color" readonly value={paramValue.toHex()} class="text-black rounded h-full" />

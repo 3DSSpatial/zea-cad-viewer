@@ -64,6 +64,7 @@
   on:input={handleEditChange}
   {step}
   type="number"
+  readonly
   value={paramValue}
   class="RangedNumberParameterWidget text-black rounded p-1"
 />
