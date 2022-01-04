@@ -562,7 +562,7 @@
     <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
   {/if}
 
-  <div class="absolute bottom-10 w-full flex justify-center">
+  <div class="absolute bottom-3 w-full flex justify-center">
     <Toolbar />
   </div>
 
