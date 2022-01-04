@@ -13,19 +13,21 @@ import {
   Color,
   Quat,
   MathFunctions,
+  FlatSurfaceMaterial,
 } from '@zeainc/zea-engine'
+import { PMIItem } from '@zeainc/zea-cad'
 
 // ////////////////////////////////////////
 // Render Modes
 
 const RENDER_MODES = {
-  WIREFRAME: Symbol(),
-  FLAT: Symbol(),
-  FLAT_WHITE: Symbol(),
-  HIDDEN_LINE: Symbol(),
-  SHADED: Symbol(),
-  SHADED_AND_EDGES: Symbol(),
-  PBR: Symbol(),
+  WIREFRAME: 'WIREFRAME',
+  FLAT: 'FLAT',
+  FLAT_WHITE: 'FLAT_WHITE',
+  HIDDEN_LINE: 'HIDDEN_LINE',
+  SHADED: 'SHADED',
+  SHADED_AND_EDGES: 'SHADED_AND_EDGES',
+  PBR: 'PBR',
 }
 
 // The default materials are standard shiny surfaces.(PBR)
@@ -39,18 +41,22 @@ const materials = {}
 // The mapping that remembers what material was assigned to the
 // geomItem at load time.
 const geomItemToMaterialMapping = {}
+const cacheMaterial = (geomItem) => {
+  const geomItemId = geomItem.getId()
+  const material = geomItem.materialParam.value
+  const materialId = material.getId()
+  if (!geomItemToMaterialMapping[geomItemId]) {
+    geomItemToMaterialMapping[geomItemId] = materialId
+  }
+  if (!materials[materialId]) {
+    materials[materialId] = {}
+    materials[materialId][RENDER_MODES.PBR] = material
+  }
+}
 const createAndAssignMaterial = (geomItem, mode, cb) => {
   const geomItemId = geomItem.getId()
   if (mode != RENDER_MODES.PBR) {
-    const material = geomItem.getParameter('Material').getValue()
-    const materialId = material.getId()
-    if (!geomItemToMaterialMapping[geomItemId]) {
-      geomItemToMaterialMapping[geomItemId] = materialId
-    }
-    if (!materials[materialId]) {
-      materials[materialId] = {}
-      materials[materialId][RENDER_MODES.PBR] = material
-    }
+    cacheMaterial(geomItem)
   }
   const materialId = geomItemToMaterialMapping[geomItemId]
   if (!materials[materialId][mode]) {
@@ -60,8 +66,9 @@ const createAndAssignMaterial = (geomItem, mode, cb) => {
     materials[materialId][mode] = newMaterial
   }
   const result = materials[materialId][mode]
-  geomItem.getParameter('Material').setValue(result)
+  geomItem.materialParam.setValue(result)
 }
+
 const handleChangeRenderModeWireframe = () => {
   if (mode == RENDER_MODES.WIREFRAME) {
     return
@@ -70,10 +77,11 @@ const handleChangeRenderModeWireframe = () => {
 
   const { assets } = get(APP_DATA)
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.getParameter('Geometry').value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
-        item.getParameter('Visible').setValue(false)
+        item.visibleParam.setValue(false)
       }
       createAndAssignMaterial(item, RENDER_MODES.WIREFRAME, (newMaterial) => {
         newMaterial.setName('Wireframe')
@@ -86,21 +94,30 @@ const handleChangeRenderModeFlatWhite = (pub = true) => {
     return
   }
   mode = RENDER_MODES.FLAT_WHITE
-  const { assets, scene, renderer, session } = $APP_DATA
+  const { assets, scene, renderer, session } = get(APP_DATA)
   renderer.outlineThickness = 1
   renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-  const backgroundColor = scene.getSettings().getParameter('BackgroundColor').getValue()
-  const whiteMaterial = new Material()
-  whiteMaterial.setShaderName('FlatSurfaceShader')
-  whiteMaterial.getParameter('BaseColor').setValue(backgroundColor)
+  const backgroundColor = renderer.getViewport().backgroundColorParam.value
+  const whiteMaterial = new FlatSurfaceMaterial()
+  whiteMaterial.baseColorParam.value = backgroundColor
 
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.geomParam.value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
+        item.visibleParam.value = true
         cacheMaterial(item)
-        item.getParameter('Visible').setValue(true)
-        item.getParameter('Material').setValue(whiteMaterial)
+        if (item.materialParam.value.isTransparent()) {
+          const currMaterial = item.materialParam.value
+          const material = whiteMaterial.clone()
+          const baseColor = whiteMaterial.getParameter('BaseColor').value
+          baseColor.a = currMaterial.getParameter('BaseColor').value.a
+          material.getParameter('BaseColor').value = baseColor
+          item.materialParam.setValue(material)
+        } else {
+          item.materialParam.setValue(whiteMaterial)
+        }
       }
     }
   })
@@ -121,12 +138,13 @@ const handleChangeRenderModeFlat = () => {
   // const backgroundColor = scene
   // .getSettings()
   // .getParameter('BackgroundColor')
-  // .getValue()
+  // .value
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.getParameter('Geometry').value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       createAndAssignMaterial(item, RENDER_MODES.FLAT, (newMaterial) => {
         newMaterial.setName('Flat')
@@ -160,10 +178,11 @@ const handleChangeRenderModeHiddenLine = () => {
   renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.getParameter('Geometry').value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       createAndAssignMaterial(item, RENDER_MODES.HIDDEN_LINE, (newMaterial) => {
         newMaterial.setName('HiddenLine')
@@ -194,13 +213,14 @@ const handleChangeRenderModeShadedAndEdges = () => {
   renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.getParameter('Geometry').value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       if (geom instanceof Lines || geom instanceof LinesProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       createAndAssignMaterial(item, RENDER_MODES.SHADED_AND_EDGES, (newMaterial) => {
         newMaterial.setName('ShadedAndEdges')
@@ -211,6 +231,7 @@ const handleChangeRenderModeShadedAndEdges = () => {
           }
         } else {
           newMaterial.setShaderName('SimpleSurfaceShader')
+          newMaterial.__isTransparent = true
         }
       })
     }
@@ -227,13 +248,14 @@ const handleChangeRenderModePBR = () => {
   renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
   assets.traverse((item) => {
+    if (item instanceof PMIItem) return false
     if (item instanceof GeomItem) {
-      const geom = item.getParameter('Geometry').getValue()
+      const geom = item.getParameter('Geometry').value
       if (geom instanceof Mesh || geom instanceof MeshProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       if (geom instanceof Lines || geom instanceof LinesProxy) {
-        item.getParameter('Visible').setValue(true)
+        item.visibleParam.value = true
       }
       createAndAssignMaterial(item, RENDER_MODES.PBR)
     }
@@ -247,10 +269,12 @@ const changeRenderMode = (mode) => {
   } else if (mode === RENDER_MODES.FLAT) {
     handleChangeRenderModeFlat()
   } else if (mode === RENDER_MODES.FLAT_WHITE) {
-    handleChangeRenderModeFlatWhite
+    handleChangeRenderModeFlatWhite()
   } else if (mode === RENDER_MODES.HIDDEN_LINE) {
     handleChangeRenderModeHiddenLine()
   } else if (mode === RENDER_MODES.SHADED) {
+    handleChangeRenderModeShadedAndEdges()
+  } else if (mode === RENDER_MODES.SHADED_AND_EDGES) {
     handleChangeRenderModeShadedAndEdges()
   } else if (mode === RENDER_MODES.PBR) {
     handleChangeRenderModePBR()
