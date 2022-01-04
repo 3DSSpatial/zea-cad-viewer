@@ -261,30 +261,33 @@
 
       // Detect a single touch, or a left button click.
       if (
-        ((event.pointerType == 'touch' && event.touches.length == 0 && event.changedTouches.length == 1) ||
-          (event.pointerType == 'mouse' && event.button == 0)) &&
-        event.intersectionData
+        (event.pointerType == 'touch' && event.touches.length == 0 && event.changedTouches.length == 1) ||
+        (event.pointerType == 'mouse' && event.button == 0)
       ) {
         // if the selection tool is active then do nothing, as it will
         // handle single click selection.s
         const toolStack = toolManager.toolStack
         if (toolStack[toolStack.length - 1] == selectionTool) return
 
-        // To provide a simple selection when the SelectionTool is not activated,
-        // we toggle selection on the item that is selcted.
-        const item = filterItemSelection(event.intersectionData.geomItem)
-        if (item) {
-          if (!event.shiftKey) {
-            $selectionManager.toggleItemSelection(item, !event.ctrlKey)
-          } else {
-            const items = new Set()
-            items.add(item)
-            $selectionManager.deselectItems(items)
+        if (event.intersectionData) {
+          // To provide a simple selection when the SelectionTool is not activated,
+          // we toggle selection on the item that is selcted.
+          const item = filterItemSelection(event.intersectionData.geomItem)
+          if (item) {
+            if (!event.shiftKey) {
+              $selectionManager.toggleItemSelection(item, !event.ctrlKey)
+            } else {
+              const items = new Set()
+              items.add(item)
+              $selectionManager.deselectItems(items)
+            }
           }
+        } else {
+          // $selectionManager.clearSelection()
+          $selectionManager.setSelection(new Set(), true)
         }
-      }
-      // Detect a right click
-      else if (event.button == 2 && event.intersectionData) {
+      } else if (event.button == 2 && event.intersectionData) {
+        // Detect a right click
         const item = filterItemSelection(event.intersectionData.geomItem)
         openMenu(event, item)
         // stop propagation to prevent the camera manipulator from handling the event.
@@ -294,6 +297,9 @@
 
     renderer.getViewport().on('pointerDoublePressed', (event) => {
       console.log(event)
+      if (!event.intersectionData) {
+        renderer.frameAll()
+      }
     })
     /** UX END */
 
