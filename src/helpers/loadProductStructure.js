@@ -1,5 +1,4 @@
-import { Color, Vec3, Xfo, Mat4, TreeItem, resourceLoader } from '@zeainc/zea-engine'
-import { CADAsset } from '@zeainc/zea-cad'
+import { Color, Vec3, Xfo, Mat4, TreeItem, resourceLoader, CADAsset } from '@zeainc/zea-engine'
 
 function checkStatus(response) {
   if (!response.ok) {

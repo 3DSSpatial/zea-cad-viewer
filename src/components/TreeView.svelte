@@ -1,8 +1,7 @@
 <script>
   import { beforeUpdate } from 'svelte'
   import TreeViewItem from './TreeViewItem.svelte'
-  import { TreeItem } from '@zeainc/zea-engine'
-  import { CADBody } from '@zeainc/zea-cad'
+  import { TreeItem, CADBody } from '@zeainc/zea-engine'
 
   let treeEl
   export let rootTreeItems

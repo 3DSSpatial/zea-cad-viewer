@@ -164,14 +164,14 @@
     changeRenderMode(RENDER_MODES.FLAT_WHITE)
     mode = RENDER_MODES.FLAT_WHITE
   }
-  const handleChangeRenderModeHiddenLine = () => {
-    changeRenderMode(RENDER_MODES.HIDDEN_LINE)
-    mode = RENDER_MODES.HIDDEN_LINE
-  }
-  const handleChangeRenderModeShadedAndEdges = () => {
-    changeRenderMode(RENDER_MODES.SHADED_AND_EDGES)
-    mode = RENDER_MODES.SHADED_AND_EDGES
-  }
+  // const handleChangeRenderModeHiddenLine = () => {
+  //   changeRenderMode(RENDER_MODES.HIDDEN_LINE)
+  //   mode = RENDER_MODES.HIDDEN_LINE
+  // }
+  // const handleChangeRenderModeShadedAndEdges = () => {
+  //   changeRenderMode(RENDER_MODES.SHADED_AND_EDGES)
+  //   mode = RENDER_MODES.SHADED_AND_EDGES
+  // }
   const handleChangeRenderModePBR = () => {
     changeRenderMode(RENDER_MODES.PBR)
     mode = RENDER_MODES.PBR
@@ -259,20 +259,20 @@
       >
         <IconRenderModeFlatWhite />
       </ToolbarItem>
-      <ToolbarItem
+      <!-- <ToolbarItem
         isHighlighted={mode === RENDER_MODES.HIDDEN_LINE}
         title="HiddenLine"
         on:click={handleChangeRenderModeHiddenLine}
       >
         <IconRenderModeHiddenLine />
-      </ToolbarItem>
-      <ToolbarItem
+      </ToolbarItem> -->
+      <!-- <ToolbarItem
         isHighlighted={mode === RENDER_MODES.SHADED_AND_EDGES}
         title="ShadedAndEdges"
         on:click={handleChangeRenderModeShadedAndEdges}
       >
         <IconRenderModeShadedAndEdges />
-      </ToolbarItem>
+      </ToolbarItem> -->
       <ToolbarItem isHighlighted={mode === RENDER_MODES.PBR} title="PBR" on:click={handleChangeRenderModePBR}>
         <IconRenderModePBR />
       </ToolbarItem>

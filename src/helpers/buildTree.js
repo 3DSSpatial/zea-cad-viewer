@@ -1,5 +1,4 @@
-import { TreeItem, InstanceItem, Registry } from '@zeainc/zea-engine'
-import { CADBody, CADPart, XRef } from '@zeainc/zea-cad'
+import { CADPart } from '@zeainc/zea-engine'
 
 const buildTree = (treeItem) => {
   const __t = (treeItem, depth, parentpath) => {
