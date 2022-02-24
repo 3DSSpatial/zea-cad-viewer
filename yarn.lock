@@ -401,12 +401,11 @@
     uuid "^8.1.0"
     validate.js "^0.13.1"
 
-"@zeainc/zea-engine@4.2.0-b20e969":
-  version "4.2.0-b20e969"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.2.0-b20e969.tgz#3664df45f1896f98a9e1988e317da07315cc00f9"
-  integrity sha512-wtfrXhYIN8+johU71C5vLJDHCKrfn+A9uIE1Y3F8NxWLUiQXvNYI/l6fI/tWGkFBuI2CkJf0AI17jsSBIjtyMg==
+"@zeainc/zea-engine@4.2.0-25a121b":
+  version "4.2.0-25a121b"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.2.0-25a121b.tgz#e8eec3026ee1b3f7bc63f18d9e68cfe744830217"
+  integrity sha512-aRUpqXFjxLXe1AIwBMqcsLcUEHDyKCM54mDs87iLP0MB6MsBK002O4ltUz8DReHvv3GVpNPyB6vYeF9wj86DLg==
   dependencies:
-    caniuse-lite "^1.0.30001309"
     lodash-es "^4.17.21"
 
 "@zeainc/zea-ux@^4.0.5":
@@ -746,11 +745,6 @@ caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001280:
   version "1.0.30001284"
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001284.tgz#d3653929ded898cd0c1f09a56fd8ca6952df4fca"
   integrity sha512-t28SKa7g6kiIQi6NHeOcKrOrGMzCRrXvlasPwWC26TH2QNdglgzQIRUuJ0cR3NeQPH+5jpuveeeSFDLm2zbkEw==
-
-caniuse-lite@^1.0.30001309:
-  version "1.0.30001312"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001312.tgz#e11eba4b87e24d22697dae05455d5aea28550d5f"
-  integrity sha512-Wiz1Psk2MEK0pX3rUzWaunLTZzqS2JYZFzNKqAiJGiuxIjRPLgV6+VDPOg6lQOUxmDwhTlh198JsTTi8Hzw6aQ==
 
 chalk@^2.0.0, chalk@^2.4.1, chalk@^2.4.2:
   version "2.4.2"
