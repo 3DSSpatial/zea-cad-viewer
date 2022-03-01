@@ -14,6 +14,7 @@
   import MenuBarItem from './MenuBarItem.svelte'
   import UserChip from './UserChip.svelte'
   import UsersChips from './UsersChips.svelte'
+  import SceneStatsDialog from '../components/SceneStatsDialog.svelte'
 
   import { auth } from '../helpers/auth'
 
@@ -119,6 +120,14 @@
     }
     selectionManager.showHandles(isTransformHandlesEnabled)
     selectionManager.updateHandleVisibility()
+  }
+
+  let isDialogOpen = false
+  const closeDialog = () => {
+    isDialogOpen = false
+  }
+  const handleDisplaySceneStats = () => {
+    isDialogOpen = true
   }
 
   onMount(() => {
@@ -300,6 +309,7 @@
               bind:checked={isDarkViewportEnabled}
               on:change={handleDarkViewportEnabled}
             />
+            <MenuItem label="Display Scene Stats" on:click={handleDisplaySceneStats} />
           </Menu>
         </MenuBarItem>
 
@@ -340,4 +350,6 @@
       {$ui.shouldShowDrawer ? 'menu_open' : 'menu'}
     </span>
   </button>
+
+  <SceneStatsDialog isOpen={isDialogOpen} close={closeDialog} />
 {/if}
