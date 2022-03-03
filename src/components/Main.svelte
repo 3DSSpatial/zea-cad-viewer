@@ -81,26 +81,6 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
-      // The following is a quick hack to remove the black outlines around PMI text.
-      // We do not crete ourlines around transparent geometries, so by forcing
-      // the PMI items sub-trees to be considered transparent, it moves them into
-      // the GLTransparentPass, which does not draw outlines. this cleans up
-      // the rendering considerably.
-      asset.traverse((item) => {
-        if (item instanceof PMIItem) {
-          item.traverse((item) => {
-            if (item instanceof GeomItem) {
-              const material = item.materialParam.value
-              material.__isTransparent = true
-              if (material.getShaderName() == 'StandardSurfaceShader') {
-                material.setShaderName('FlatSurfaceShader')
-              }
-            }
-          })
-          return false
-        }
-        return true
-      })
       renderer.frameAll()
     })
     $assets.addChild(asset)
@@ -201,9 +181,7 @@
     // Note: the alpha value determines  the fill of the highlight.
     const selectionColor = new Color('#F9CE03')
     selectionColor.a = 0.1
-    const subtreeColor = selectionColor //.lerp(new Color(1, 1, 1, 0), 0.5)
     $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(selectionColor)
-    $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(subtreeColor)
 
     // Color the selection rect.
     const selectionRectColor = new Color(0, 0, 0, 1)
@@ -212,6 +190,10 @@
     /** SELECTION END */
 
     /** UX START */
+
+    const viewCube = document.getElementById('view-cube')
+    viewCube.setViewport(renderer.getViewport())
+
     //long touch support
     var longTouchTimer = 0
     const camera = renderer.getViewport().getCamera()
@@ -547,6 +529,9 @@
 
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
+
+  <zea-view-cube id="view-cube" />
+
   {#if !fileLoaded}
     <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
   {/if}

@@ -401,17 +401,17 @@
     uuid "^8.1.0"
     validate.js "^0.13.1"
 
-"@zeainc/zea-engine@4.2.0-25a121b":
-  version "4.2.0-25a121b"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.2.0-25a121b.tgz#e8eec3026ee1b3f7bc63f18d9e68cfe744830217"
-  integrity sha512-aRUpqXFjxLXe1AIwBMqcsLcUEHDyKCM54mDs87iLP0MB6MsBK002O4ltUz8DReHvv3GVpNPyB6vYeF9wj86DLg==
+"@zeainc/zea-engine@4.2.0-81aa8c9":
+  version "4.2.0-81aa8c9"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.2.0-81aa8c9.tgz#154dc8fc6b06695558461676abe7804cf0b7bbe1"
+  integrity sha512-fHV46H+B7qgr8/JQWEGaOH1rv/cnff1qp5toboJd+Did6akmB0DeRsldDinUjYSFe7ik4eH4czNoHNlwDtEYYw==
   dependencies:
     lodash-es "^4.17.21"
 
-"@zeainc/zea-ux@^4.0.5":
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-ux/-/zea-ux-4.0.5.tgz#06da0e6ffec92dd7d9b01ef1451702f2163de257"
-  integrity sha512-Zo/6NV1mhoRhojIGlTExq5+sgYqSKJ8xTNiqILbmmcKzaffdyi8/dJO/gEj+AdBAQhJnORYOMovz1c6JZa6P+A==
+"@zeainc/zea-ux@4.0.5-d5bff18":
+  version "4.0.5-d5bff18"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-ux/-/zea-ux-4.0.5-d5bff18.tgz#5fd37dbc4f10ce607554eec1c76d87e9da185320"
+  integrity sha512-GK/ut67D7aCTledRBQnyJ060TgTkB08LXdwDHZlu9qpeZw6ip67Gce11pAUeFm0wMfyUtvv/wI5vI0h3Qn3qZw==
   dependencies:
     dom-to-image "^2.6.0"
 

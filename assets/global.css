@@ -55,9 +55,15 @@ body,
 }
 
 /* Rules for menu, menu options and dialog */
-:global(:root){
-  --color-background-1: rgb(0,0,0);
+:global(:root) {
+  --color-background-1: rgb(0, 0, 0);
   --color-background-2: rgba(114, 109, 109, 0.5);
   --color-foreground-1: rgb(254, 254, 255);
   --color-foreground-2: rgba(145, 138, 16, 0.8);
-} 
+}
+
+#view-cube {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}

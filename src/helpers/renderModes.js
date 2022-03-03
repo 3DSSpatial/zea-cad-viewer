@@ -235,7 +235,7 @@ const handleChangeRenderModeShadedAndEdges = () => {
           }
         } else {
           newMaterial.setShaderName('SimpleSurfaceShader')
-          newMaterial.__isTransparent = true
+          newMaterial.__isOpaque = false
         }
       })
     }

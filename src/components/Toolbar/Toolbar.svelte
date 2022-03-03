@@ -5,14 +5,6 @@
   import ToolbarItem from './ToolbarItem.svelte'
   import ToolbarItemPopup from './ToolbarItemPopup.svelte'
 
-  import IconFrontView from '../icons/IconFrontView.svelte'
-  import IconBackView from '../icons/IconBackView.svelte'
-  import IconTopView from '../icons/IconTopView.svelte'
-  import IconBottomView from '../icons/IconBottomView.svelte'
-  import IconLeftView from '../icons/IconLeftView.svelte'
-  import IconRightView from '../icons/IconRightView.svelte'
-  import IconPerspView from '../icons/IconPerspView.svelte'
-
   import IconMeasureDistance from '../icons/IconMeasureDistance.svelte'
   import IconMeasureAngle from '../icons/IconMeasureAngle.svelte'
   import IconMeasureCenterDistance from '../icons/IconMeasureCenterDistance.svelte'
@@ -26,111 +18,8 @@
   import IconRenderModePBR from '../icons/IconRenderModePBR.svelte'
   import IconRenderModeHiddenLine from '../icons/IconRenderModeHiddenLine.svelte'
 
-  import { APP_DATA } from '../../stores/appData'
   import { RENDER_MODES, changeRenderMode } from '../../helpers/renderModes'
   import { MEASURE_TOOLS, toggleMeasureTool } from '../../helpers/measureTools'
-
-  import { Vec3, Xfo, Mat3, Quat, MathFunctions } from '@zeainc/zea-engine'
-
-  const setCameraXfo = (camera, dir, up, ortho, duration = 400) => {
-    const { renderer } = $APP_DATA
-    const startTarget = camera.getTargetPosition()
-    const startDist = camera.getFocalDistance()
-
-    const startXfo = camera.getParameter('GlobalXfo').getValue()
-
-    // Calculate the target orientation of the camera.
-    const sw = dir.cross(up).normalize()
-    const upNormalized = sw.cross(dir).normalize()
-    const mat3 = new Mat3(sw, upNormalized, dir.negate())
-    const endOri = new Quat()
-    endOri.setFromMat3(mat3)
-    endOri.alignWith(startXfo.ori)
-
-    const xfo = new Xfo()
-    xfo.ori = endOri
-    camera.getParameter('GlobalXfo').setValue(xfo)
-    // Now to calculate where the camera will end up at the end
-    // after framing, we set the camera Xfo, call frameAll,
-    // extract the target, and then put back the old value so we can
-    // start interpolating.
-    renderer.frameAll()
-    const endTarget = camera.getTargetPosition()
-    const endDist = camera.getFocalDistance()
-    camera.getParameter('GlobalXfo').setValue(startXfo)
-
-    const count = Math.round(duration / 20) // each step is 20ms
-    let id
-    let i = 1
-    const applyMovement = () => {
-      const lerpValue = i / count
-
-      // interpolate the orientation between the start and the end ones.
-      const xfo = new Xfo()
-      xfo.ori = startXfo.ori.lerp(endOri, lerpValue).normalize()
-
-      // interpolate the target and distance between the start and the end ones.
-      const target = startTarget.lerp(endTarget, lerpValue)
-      const dist = MathFunctions.lerp(startDist, endDist, lerpValue)
-
-      // Move the camera back away from the new target using the orientation.
-      const newDir = xfo.ori.getZaxis().negate()
-      xfo.tr = target.subtract(newDir.scale(dist))
-
-      camera.getParameter('GlobalXfo').setValue(xfo)
-      if (ortho) camera.setIsOrthographic(lerpValue)
-      else camera.setIsOrthographic(1 - lerpValue)
-      i++
-      if (i <= count) {
-        id = setTimeout(applyMovement, 20)
-      } else {
-        //renderer.frameAll()
-        // Thie event tells the viewport to re-rendeer the picking buffer.
-        camera.emit('movementFinished')
-      }
-    }
-    applyMovement()
-  }
-
-  /* {{{ View handlers. */
-  const handleChangeViewFront = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 1, 0), new Vec3(0, 0, 1), true)
-  }
-  const handleChangeViewBack = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, -1, 0), new Vec3(0, 0, 1), true)
-  }
-  const handleChangeViewTop = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 0, -1), new Vec3(0, 1, 0), true)
-  }
-  const handleChangeViewBottom = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(0, 0, 1), new Vec3(0, -1, 0), true)
-  }
-  const handleChangeViewLeft = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(1, 0, 0), new Vec3(0, 0, 1), true)
-  }
-  const handleChangeViewRight = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    setCameraXfo(camera, new Vec3(-1, 0, 0), new Vec3(0, 0, 1), true)
-  }
-  const handleChangeViewPerspective = () => {
-    const { renderer } = $APP_DATA
-    const camera = renderer.getViewport().getCamera()
-    const dir = new Vec3(-1, 1, -1)
-    dir.normalizeInPlace()
-    setCameraXfo(camera, dir, new Vec3(0, 0, 1), false)
-  }
-  /* }}} View handlers. */
 
   // ////////////////////////////////////////
   // Measure Tools
@@ -179,32 +68,6 @@
 </script>
 
 <div class="Toolbar flex gap-1" class:flex-col={orientation === 'vertical'}>
-  <ToolbarItemPopup title="CameraView">
-    <IconPerspView />
-    <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
-      <ToolbarItem title="Front" on:click={handleChangeViewFront}>
-        <IconFrontView />
-      </ToolbarItem>
-      <ToolbarItem title="Back" on:click={handleChangeViewBack}>
-        <IconBackView />
-      </ToolbarItem>
-      <ToolbarItem title="Top" on:click={handleChangeViewTop}>
-        <IconTopView />
-      </ToolbarItem>
-      <ToolbarItem title="Bottom" on:click={handleChangeViewBottom}>
-        <IconBottomView />
-      </ToolbarItem>
-      <ToolbarItem title="Left" on:click={handleChangeViewLeft}>
-        <IconLeftView />
-      </ToolbarItem>
-      <ToolbarItem title="Right" on:click={handleChangeViewRight}>
-        <IconRightView />
-      </ToolbarItem>
-      <ToolbarItem title="Perspective" on:click={handleChangeViewPerspective}>
-        <IconPerspView />
-      </ToolbarItem>
-    </div>
-  </ToolbarItemPopup>
   <ToolbarItemPopup isHighlighted={measureTool !== MEASURE_TOOLS.NONE} title="Measure Tools">
     <IconMeasureDistance />
     <div class="flex flex-col absolute bottom-full gap-1 mb-1" slot="popup">
