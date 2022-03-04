@@ -192,6 +192,7 @@
     /** UX START */
 
     const viewCube = document.getElementById('view-cube')
+    console.log('Setup Viewcube:', viewCube, renderer.getViewport())
     viewCube.setViewport(renderer.getViewport())
 
     //long touch support
