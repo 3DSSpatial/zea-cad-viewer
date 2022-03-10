@@ -120,7 +120,7 @@
       const path = []
       while (true) {
         path.splice(0, 0, selectedItem)
-        if (rootTreeItems.includes(selectedItem)) break
+        if (rootTreeItems.includes(selectedItem) || !selectedItem) break
         selectedItem = selectedItem.getOwner()
       }
       rootTreeItems.forEach((rootTreeItem, index) => {
