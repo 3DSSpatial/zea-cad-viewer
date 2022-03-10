@@ -193,9 +193,9 @@
 
     /** UX START */
 
-    const viewCube = document.getElementById('view-cube')
+    // const viewCube = document.getElementById('view-cube')
     // console.log('Setup Viewcube:', viewCube, renderer.getViewport())
-    viewCube.setViewport(renderer.getViewport())
+    // viewCube.setViewport(renderer.getViewport())
 
     //long touch support
     var longTouchTimer = 0
@@ -535,7 +535,7 @@
 <main class="Main flex-1 relative">
   <canvas bind:this={canvas} class="absolute h-full w-full" />
 
-  <zea-view-cube id="view-cube" />
+  <!-- <zea-view-cube id="view-cube" /> -->
 
   {#if !fileLoaded}
     <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
