@@ -129,8 +129,8 @@
       $scene.envMapParam.value = envMap
     }
 
-    renderer.outlineThickness = 0.75
-    renderer.outlineSensitivity = 0.25
+    renderer.outlineThickness = 0.5
+    renderer.outlineSensitivity = 5
     renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
 
     // $scene.setupGrid(10, 10)
