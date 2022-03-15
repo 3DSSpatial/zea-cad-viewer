@@ -54,7 +54,7 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('roomId')
   let progress
-  let files = ''
+  let files = []
   let fileLoaded = false
   const appData = {}
   let renderer
@@ -115,6 +115,8 @@
   onMount(async () => {
     renderer = new MyRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
+      enableFrustumCulling: true,
+      enableOcclusionCulling: false,
     })
 
     $scene = new Scene()
@@ -503,24 +505,26 @@
   const handleCadFile = () => {
     $assets.removeAllChildren()
 
-    const reader = new FileReader()
+    const urls = {}
+    files.forEach((file) => {
+      const filename = file.name
+      const url = URL.createObjectURL(file)
+      urls[filename] = url
+    })
 
-    reader.addEventListener(
-      'load',
-      function () {
-        const url = reader.result
-        const filename = files.name
-        loadAsset(url, filename)
+    files.forEach((file) => {
+      if (file.name.endsWith('.zcad')) {
+        const filename = file.name
+        const assetItem = loadAsset(urls[filename], filename)
 
-        // If a collabroative session is running, pass the data
-        // to the other session users to load.
-        const { session } = appData
-        if (session) session.pub('loadAsset', { url, filename })
-      },
-      false
-    )
-
-    reader.readAsDataURL(files)
+        const metadataFilename = filename.slice(0, filename.length - 5) + '.zmetadata'
+        if (metadataFilename in urls) {
+          assetItem.geomLibrary.once('loaded', () => {
+            assetItem.loadMetadata(urls[metadataFilename])
+          })
+        }
+      }
+    })
   }
 
   /** LOAD ASSETS FROM FILE END */

@@ -3,7 +3,7 @@
 
   const dispatch = createEventDispatcher()
 
-  export let files
+  export let files = []
   export let fileLoaded
 
   let isDisabled = false
@@ -19,22 +19,24 @@
   document.body.addEventListener('dragenter', dragenter)
 
   const handleDrop = (ev) => {
+    files = []
     for (var i = 0; i < ev.dataTransfer.items.length; i++) {
       // If dropped items aren't files, reject them
       if (ev.dataTransfer.items[i].kind === 'file') {
-        files = ev.dataTransfer.items[i].getAsFile()
-        dispatch('changeFile')
+        files.push(ev.dataTransfer.items[i].getAsFile())
       }
     }
+    dispatch('changeFile')
     fileLoaded = true
     isDisabled = true
   }
 
   const handleSelect = (ev) => {
+    files = []
     for (var i = 0; i < ev.target.files.length; i++) {
-      files = ev.target.files[i]
-      dispatch('changeFile')
+      files.push((files = ev.target.files[i]))
     }
+    dispatch('changeFile')
     fileLoaded = true
     isDisabled = true
   }
