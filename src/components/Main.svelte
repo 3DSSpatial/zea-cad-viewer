@@ -114,14 +114,9 @@
   }
   /** LOAD ASSETS METHODS END */
 
-  class MyRenderer extends GLRenderer {
-    handleResize(displayWidth, displayHeight) {
-      super.handleResize(Math.max(4, displayWidth), Math.max(4, displayHeight))
-    }
-  }
 
   onMount(async () => {
-    renderer = new MyRenderer(canvas, {
+    renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       enableFrustumCulling: true,
       enableOcclusionCulling: false,
