@@ -81,6 +81,14 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
+      const materiaLibrary = asset.getMaterialLibrary()
+      materiaLibrary.getMaterials().forEach((material) => {
+        if (material.getShaderName() == 'LinesShader') {
+          const opacityParam = material.getParameter('Opacity')
+          opacityParam.value = 1.0
+        }
+      })
+
       renderer.frameAll()
     })
     $assets.addChild(asset)
