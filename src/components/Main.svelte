@@ -54,7 +54,6 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('roomId')
   let progress
-  let files = []
   let fileLoaded = false
   const appData = {}
   let renderer
@@ -502,7 +501,9 @@
 
   /** LOAD ASSETS FROM FILE START */
 
-  const handleCadFile = () => {
+  const handleCadFile = (event) => {
+    const { files } = event.detail
+
     $assets.removeAllChildren()
 
     const urls = {}
@@ -532,16 +533,16 @@
   $: parameterOwner = null
 </script>
 
-<main class="Main flex-1 relative">
-  <canvas bind:this={canvas} class="absolute h-full w-full" />
+<main class="relative flex-1 Main">
+  <canvas bind:this={canvas} class="absolute w-full h-full" />
 
   <!-- <zea-view-cube id="view-cube" /> -->
 
   {#if !fileLoaded}
-    <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
+    <DropZone on:changeFile={handleCadFile} {fileLoaded} />
   {/if}
 
-  <div class="absolute bottom-3 w-full flex justify-center">
+  <div class="absolute flex justify-center w-full bottom-3">
     <Toolbar />
   </div>
 

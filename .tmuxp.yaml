@@ -1,9 +1,9 @@
 session_name: Zea CAD Viewer
 suppress_history: false
 windows:
-  - layout: main-vertical
-    panes:
+  - panes:
       - yarn run dev
+  - panes:
       - ${EDITOR} -S
   - panes:
       - shell_command:
