@@ -3,10 +3,13 @@
 
   const dispatch = createEventDispatcher()
 
-  export let files = []
   export let fileLoaded
 
   let isDisabled = false
+
+  const dispatchChangeFile = (files) => {
+    dispatch('changeFile', { files })
+  }
 
   // Based on this answer: https://stackoverflow.com/a/61417954
   const dragenter = () => {
@@ -19,24 +22,24 @@
   document.body.addEventListener('dragenter', dragenter)
 
   const handleDrop = (ev) => {
-    files = []
+    const files = []
     for (var i = 0; i < ev.dataTransfer.items.length; i++) {
       // If dropped items aren't files, reject them
       if (ev.dataTransfer.items[i].kind === 'file') {
         files.push(ev.dataTransfer.items[i].getAsFile())
       }
     }
-    dispatch('changeFile')
+    dispatchChangeFile(files)
     fileLoaded = true
     isDisabled = true
   }
 
   const handleSelect = (ev) => {
-    files = []
+    const files = []
     for (var i = 0; i < ev.target.files.length; i++) {
-      files.push((files = ev.target.files[i]))
+      files.push(ev.target.files[i])
     }
-    dispatch('changeFile')
+    dispatchChangeFile(files)
     fileLoaded = true
     isDisabled = true
   }
@@ -50,7 +53,6 @@
     on:change={(e) => {
       handleSelect(e)
     }}
-    bind:this={files}
     type="file"
     class="absolute inset-0 z-50 w-full h-full p-0 m-0 outline-none opacity-0"
   />
