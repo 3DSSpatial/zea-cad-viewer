@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@zeainc/gltf-loader": "^4.0.4",
-    "@zeainc/zea-engine": "4.3.0-c078ea9",
+    "@zeainc/zea-engine": "4.3.0-0a7519a",
     "@zeainc/zea-ux": "4.0.5-d5bff18"
   },
   "devDependencies": {

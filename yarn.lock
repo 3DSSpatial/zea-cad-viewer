@@ -401,10 +401,10 @@
     uuid "^8.1.0"
     validate.js "^0.13.1"
 
-"@zeainc/zea-engine@4.3.0-c078ea9":
-  version "4.3.0-c078ea9"
-  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.3.0-c078ea9.tgz#7a13974950dbf9e8e74a570802cd93853df04006"
-  integrity sha512-gdwNCe4Qi+iXAS51Kx+3gBrFoL2UTOBp8X3dU1t+kMOSj/pMba3nMvNgVc97KvEPBWHyfFTF1xUE3kRMXP/Vdg==
+"@zeainc/zea-engine@4.3.0-0a7519a":
+  version "4.3.0-0a7519a"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.3.0-0a7519a.tgz#47aa577c6b6790aa19d9333802380aa08c1f9a47"
+  integrity sha512-Tzd7aRr4OfeTGLzQnEqhBNBW9W3tN+beFWxrH8hfkHrqPEn9lpT/VIlb3ZAOfTWAfb8eiaNDI0lA6IOie27YFA==
   dependencies:
     lodash-es "^4.17.21"
 
