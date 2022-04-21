@@ -276,8 +276,10 @@
     })
 
     renderer.getViewport().on('pointerDoublePressed', (event) => {
-      // Double click in empty space fits the data to the view.
+      // multi-touch is currently triggering a 'pointerDoublePressed' event.
       if (event.pointerType == 'touch' && event.touches.length == 2) return
+
+      // Double click in empty space fits the data to the view.
       if (!event.intersectionData) {
         renderer.frameAll()
       }
