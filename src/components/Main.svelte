@@ -276,7 +276,8 @@
     })
 
     renderer.getViewport().on('pointerDoublePressed', (event) => {
-      console.log(event)
+      // Double click in empty space fits the data to the view.
+      if (event.pointerType == 'touch' && event.touches.length == 2) return
       if (!event.intersectionData) {
         renderer.frameAll()
       }
