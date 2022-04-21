@@ -139,7 +139,7 @@
       renderer.hiddenLineColor = new Color(0.2, 0.2, 0.2, 0.0)
     }
 
-    // $scene.setupGrid(10, 10)
+    $scene.setupGrid(10, 10)
     renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85, 1)
     renderer.setScene($scene)
 
