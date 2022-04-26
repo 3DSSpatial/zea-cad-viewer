@@ -57,7 +57,6 @@ const handleChangeRenderModeHiddenLine = () => {
 
   const { renderer } = get(APP_DATA)
   renderer.renderMode = 'flat'
-  renderer.hiddenLineColor.r = 1.0
   renderer.hiddenLineColor.a = 0.1
   renderer.requestRedraw()
 }

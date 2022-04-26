@@ -80,11 +80,17 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
+      console.log('Loading CAD File version:', asset.cadfileVersion, ' exported using SDK:', asset.sdk)
       const materiaLibrary = asset.getMaterialLibrary()
       materiaLibrary.getMaterials().forEach((material) => {
         if (material.getShaderName() == 'LinesShader') {
           const opacityParam = material.getParameter('Opacity')
           opacityParam.value = 1.0
+        } else if (material.getShaderName() == 'StandardSurfaceShader') {
+          // It seems like edge colors are not showing up very well when drawing outlines.
+          // The outlines seem too transparent. So forcing them to use the renderer.outlineColor
+          const edgeColorParam = material.getParameter('EdgeColor')
+          edgeColorParam.value = renderer.outlineColor
         }
       })
 
@@ -132,12 +138,11 @@
       $scene.envMapParam.value = envMap
     }
 
-    if (!isMobileDevice) {
-      renderer.outlineThickness = 0.5
-      renderer.outlineSensitivity = 5
-      renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
-      renderer.hiddenLineColor = new Color(0.2, 0.2, 0.2, 0.0)
-    }
+    renderer.outlineThickness = 1.5
+    renderer.outlineSensitivity = 5
+    renderer.highlightOutlineThickness = 1.75
+    renderer.outlineColor = new Color(0, 0, 0, 0.6)
+    renderer.hiddenLineColor = new Color(0.2, 0.2, 0.2, 0.0)
 
     $scene.setupGrid(10, 10)
     renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85, 1)
