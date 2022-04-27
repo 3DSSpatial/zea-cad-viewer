@@ -1,5 +1,5 @@
 {
-  "name": "zea-cloud-cad-viewer",
+  "name": "zea-cad-viewer",
   "version": "0.0.1",
   "dependencies": {
     "@zeainc/gltf-loader": "^4.0.5",
@@ -15,7 +15,6 @@
     "@rollup/plugin-typescript": "^6.0.0",
     "@roxi/routify": "^2.15.1",
     "@tsconfig/svelte": "^1.0.0",
-    "@zeainc/zea-cloud-sdk-web": "^1.0.0-0",
     "babel-loader": "^8.2.2",
     "cross-env": "^7.0.2",
     "cssnano": "^4.1.10",
