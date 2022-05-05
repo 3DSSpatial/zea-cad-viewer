@@ -378,10 +378,10 @@
     fast-png "^6.1.0"
     jpeg-js "^0.4.3"
 
-"@zeainc/zea-engine@4.4.0":
-  version "4.4.0"
-  resolved "https://registry.npmjs.org/@zeainc/zea-engine/-/zea-engine-4.4.0.tgz"
-  integrity sha512-wLvXmGKwN0TDwO4ej7SL5+suJhQUF5sDuXNwgbqkUjv7tTnxX1BAKOsdMaxi3NRifQ2NjFJvGoyiPCzMD6xTOA==
+"@zeainc/zea-engine@4.4.0-6360602":
+  version "4.4.0-6360602"
+  resolved "https://registry.yarnpkg.com/@zeainc/zea-engine/-/zea-engine-4.4.0-6360602.tgz#6732b98a6ad2f7a97c442e542078a8e33dcc3b2b"
+  integrity sha512-t/NgtD5pq1SZGkAAHO5P0rZmxe7/bwatEe5t+su6p5Z/2fBTn9Un1GdHqBkQqrKH3kTvjq84TudHc8ep9Es7dA==
   dependencies:
     lodash-es "^4.17.21"
 
@@ -3585,6 +3585,7 @@ sorcery@^0.10.0:
     sourcemap-codec "^1.3.0"
 
 "source-map-fast@npm:source-map@0.7.3", source-map@^0.7.3, source-map@~0.7.2:
+  name source-map-fast
   version "0.7.3"
   resolved "https://registry.npmjs.org/source-map/-/source-map-0.7.3.tgz"
   integrity sha512-CkCj6giN3S+n9qrYiBTX5gystlENnRW5jZeNLHpe6aue+SrHcG5VYwujhW9s4dY31mEGsxBDrHR6oI69fTXsaQ==

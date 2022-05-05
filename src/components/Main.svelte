@@ -120,15 +120,17 @@
   /** LOAD ASSETS METHODS END */
 
   onMount(async () => {
+    const { isMobileDevice } = SystemDesc
+
     renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
       enableFrustumCulling: true,
       enableOcclusionCulling: false,
+      /* Due to bugs in the mobile support for multi-draw, and the fact , we are */
+      disableMultiDraw: ZeaSystemDesc.OS == 'Android',
     })
 
     $scene = new Scene()
-
-    const { isMobileDevice } = SystemDesc
 
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
     if (!isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
