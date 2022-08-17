@@ -54,7 +54,6 @@
   const embeddedMode = urlParams.has('embedded')
   const collabEnabled = urlParams.has('roomId')
   let progress
-  let files = ''
   let fileLoaded = false
   const appData = {}
   let renderer
@@ -81,6 +80,20 @@
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
     asset.load(url, context).then(() => {
+      console.log('Loading CAD File version:', asset.cadfileVersion, ' exported using SDK:', asset.sdk)
+      const materiaLibrary = asset.getMaterialLibrary()
+      materiaLibrary.getMaterials().forEach((material) => {
+        if (material.getShaderName() == 'LinesShader') {
+          const opacityParam = material.getParameter('Opacity')
+          opacityParam.value = 1.0
+        } else if (material.getShaderName() == 'StandardSurfaceShader') {
+          // It seems like edge colors are not showing up very well when drawing outlines.
+          // The outlines seem too transparent. So forcing them to use the renderer.outlineColor
+          const edgeColorParam = material.getParameter('EdgeColor')
+          edgeColorParam.value = renderer.outlineColor
+        }
+      })
+
       renderer.frameAll()
     })
     $assets.addChild(asset)
@@ -106,32 +119,34 @@
   }
   /** LOAD ASSETS METHODS END */
 
-  class MyRenderer extends GLRenderer {
-    handleResize(displayWidth, displayHeight) {
-      super.handleResize(Math.max(4, displayWidth), Math.max(4, displayHeight))
-    }
-  }
-
   onMount(async () => {
-    renderer = new MyRenderer(canvas, {
+    const { isMobileDevice } = SystemDesc
+
+    renderer = new GLRenderer(canvas, {
       debugGeomIds: urlParams.has('debugGeomIds'),
+      enableFrustumCulling: true,
+      enableOcclusionCulling: false,
+      /* Due to bugs in the mobile support for multi-draw, and the fact , we are */
+      disableMultiDraw: ZeaSystemDesc.OS == 'Android',
     })
 
     $scene = new Scene()
 
     // Assigning an Environment Map enables PBR lighting for niceer shiny surfaces.
-    if (!SystemDesc.isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
+    if (!isMobileDevice && SystemDesc.gpuDesc.supportsWebGL2) {
       const envMap = new EnvMap('envMap')
       envMap.load('data/StudioG.zenv')
       envMap.headlightModeParam.value = true
       $scene.envMapParam.value = envMap
     }
 
-    renderer.outlineThickness = 0.75
-    renderer.outlineSensitivity = 0.25
-    renderer.outlineColor = new Color(0.2, 0.2, 0.2, 1)
+    renderer.outlineThickness = 1.5
+    renderer.outlineSensitivity = 5
+    renderer.highlightOutlineThickness = 1.75
+    renderer.outlineColor = new Color(0, 0, 0, 0.6)
+    renderer.hiddenLineColor = new Color(0.2, 0.2, 0.2, 0.0)
 
-    // $scene.setupGrid(10, 10)
+    $scene.setupGrid(10, 10)
     renderer.getViewport().backgroundColorParam.value = new Color(0.85, 0.85, 0.85, 1)
     renderer.setScene($scene)
 
@@ -268,7 +283,10 @@
     })
 
     renderer.getViewport().on('pointerDoublePressed', (event) => {
-      console.log(event)
+      // multi-touch is currently triggering a 'pointerDoublePressed' event.
+      if (event.pointerType == 'touch' && event.touches.length == 2) return
+
+      // Double click in empty space fits the data to the view.
       if (!event.intersectionData) {
         renderer.frameAll()
       }
@@ -500,27 +518,31 @@
 
   /** LOAD ASSETS FROM FILE START */
 
-  const handleCadFile = () => {
+  const handleCadFile = (event) => {
+    const { files } = event.detail
+
     $assets.removeAllChildren()
 
-    const reader = new FileReader()
+    const urls = {}
+    files.forEach((file) => {
+      const filename = file.name
+      const url = URL.createObjectURL(file)
+      urls[filename] = url
+    })
 
-    reader.addEventListener(
-      'load',
-      function () {
-        const url = reader.result
-        const filename = files.name
-        loadAsset(url, filename)
+    files.forEach((file) => {
+      if (file.name.endsWith('.zcad')) {
+        const filename = file.name
+        const assetItem = loadAsset(urls[filename], filename)
 
-        // If a collabroative session is running, pass the data
-        // to the other session users to load.
-        const { session } = appData
-        if (session) session.pub('loadAsset', { url, filename })
-      },
-      false
-    )
-
-    reader.readAsDataURL(files)
+        const metadataFilename = filename.slice(0, filename.length - 5) + '.zmetadata'
+        if (metadataFilename in urls) {
+          assetItem.geomLibrary.once('loaded', () => {
+            assetItem.loadMetadata(urls[metadataFilename])
+          })
+        }
+      }
+    })
   }
 
   /** LOAD ASSETS FROM FILE END */
@@ -528,16 +550,16 @@
   $: parameterOwner = null
 </script>
 
-<main class="Main flex-1 relative">
-  <canvas bind:this={canvas} class="absolute h-full w-full" />
+<main class="relative flex-1 Main">
+  <canvas bind:this={canvas} class="absolute w-full h-full" />
 
   <!-- <zea-view-cube id="view-cube" /> -->
 
   {#if !fileLoaded}
-    <DropZone bind:files on:changeFile={handleCadFile} {fileLoaded} />
+    <DropZone on:changeFile={handleCadFile} {fileLoaded} />
   {/if}
 
-  <div class="absolute bottom-3 w-full flex justify-center">
+  <div class="absolute flex justify-center w-full bottom-3">
     <Toolbar />
   </div>
 

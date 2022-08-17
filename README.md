@@ -10,12 +10,6 @@ The zea-cad-viewer is an embeddable web application for viewing CAD data. It is 
 
 > https://cad-viewer-staging.zea.live/?zcad=data/Rod%20with%20PMI.zcad
 
-# Processing CAD files using the zea-cloud API.
-
-zcad file can be produced using a few different mechanisims. The Zea Cloud Hello world project shows you how to use the Cloud APIs to process files and download them to your system, or directly launch the viewer.
-
-https://github.com/ZeaInc/zea-cloud-hello-world
-
 # Embedding the Zea CAD Viewer in your own Web App
 
 ## Live Demo
