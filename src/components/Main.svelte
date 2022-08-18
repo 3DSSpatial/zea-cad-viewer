@@ -24,6 +24,7 @@
   import buildTree from '../helpers/buildTree'
   import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
   import { setupMeasurementTools } from '../helpers/measureTools'
+  import AsmExplode from '../components/AsmExplode.svelte';
 
   import {
     Color,
@@ -551,6 +552,13 @@
 </script>
 
 <main class="relative flex-1 Main">
+
+  {#if $ui.asmExplodeEnabled}
+  <div id="asmSlider">
+    <AsmExplode/>
+  </div>
+  {/if}
+
   <canvas bind:this={canvas} class="absolute w-full h-full" />
 
   <!-- <zea-view-cube id="view-cube" /> -->
@@ -606,4 +614,10 @@
   canvas {
     touch-action: none;
   }
+
+  #asmSlider {
+    display: flex;
+    align-items: center;
+  }
 </style>
+
