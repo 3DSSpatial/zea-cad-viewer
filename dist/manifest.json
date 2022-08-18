@@ -1,0 +1,23 @@
+{
+  "background_color": "#222222",
+  "theme_color": "#f9ce03",
+  "name": "Zea Svelte Template",
+  "short_name": "Zea Svelte Template",
+  "start_url": "/",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "images/manifest-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "images/manifest-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "orientation": "landscape"
+}
