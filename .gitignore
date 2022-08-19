@@ -5,3 +5,4 @@ scripts/
 src/tmp/
 .routify/
 assets/build/
+dist/
