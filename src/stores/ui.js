@@ -7,7 +7,6 @@ const ui = writable({
   currentMenuBarItem: null,
   shouldShowDrawer: false,
   shouldShowParameterOwnerWidget: false,
-  asmExplodeEnabled: false,
 })
 
 export { ui }

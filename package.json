@@ -1,10 +1,11 @@
 {
   "name": "zea-cad-viewer",
   "version": "0.0.1",
+  "license": "MIT",
   "dependencies": {
     "@zeainc/gltf-loader": "^4.0.5",
-    "@zeainc/zea-engine": "4.4.0-6360602",
-    "@zeainc/zea-ux": "4.1.0"
+    "@zeainc/zea-engine": "4.8.0-1513b0f",
+    "@zeainc/zea-ux": "4.4.0-133803e"
   },
   "devDependencies": {
     "@auth0/auth0-spa-js": "^1.6.5",
@@ -43,7 +44,9 @@
     "tslib": "^2.0.0",
     "typescript": "^3.9.3"
   },
-  "license": "MIT",
+  "browser": {
+    "crypto": false
+  },
   "scripts": {
     "build": "run-s build:*",
     "build:app": "routify -b && rollup -c",

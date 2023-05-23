@@ -227,14 +227,6 @@
   }
 
   // ////////////////////////////////////
-  // Asm
-  let asmExplodeEnabled = false
-  const handleAsmExplode = () => {
-    $ui.asmExplodeEnabled = !$ui.asmExplodeEnabled
-  }
-
-
-  // ////////////////////////////////////
   // Collab
 
   const handleDA = () => {
@@ -344,12 +336,6 @@
         <MenuBarItem label="VR" let:isOpen>
           <Menu {isOpen}>
             <MenuItem disabled={vrToggleMenuItemDisabled} label={vrToggleMenuItemLabel} on:click={handleLaunchVR} />
-          </Menu>
-        </MenuBarItem>
-
-        <MenuBarItem label="Asm" let:isOpen>
-          <Menu {isOpen}>
-            <MenuItem label="Explode" on:click={handleAsmExplode} />
           </Menu>
         </MenuBarItem>
       </MenuBar>

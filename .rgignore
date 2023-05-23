@@ -1,0 +1,4 @@
+.git/
+.routify/
+dist/
+node_modules/

@@ -20,30 +20,21 @@
   import { selectionManager } from '../stores/selectionManager.js'
   import { scene } from '../stores/scene.js'
 
-  import { createClient } from '../ChannelMessenger.js'
-  import buildTree from '../helpers/buildTree'
-  import { RENDER_MODES, changeRenderMode } from '../helpers/renderModes'
   import { setupMeasurementTools } from '../helpers/measureTools'
-  import AsmExplode from '../components/AsmExplode.svelte';
 
   import {
     Color,
-    Vec3,
-    Xfo,
     TreeItem,
     GLRenderer,
     Scene,
     resourceLoader,
     SystemDesc,
     EnvMap,
-    InstanceItem,
     CameraManipulator,
     AssetLoadContext,
-    GeomItem,
     CADAsset,
-    CADBody,
-    CADPart,
     PMIItem,
+    XRef,
   } from '@zeainc/zea-engine'
   import { SelectionManager, UndoRedoManager, ToolManager, SelectionTool } from '@zeainc/zea-ux'
 
@@ -52,11 +43,8 @@
   let canvas
   let fpsContainer
   const urlParams = new URLSearchParams(window.location.search)
-  const embeddedMode = urlParams.has('embedded')
-  const collabEnabled = urlParams.has('roomId')
   let progress
   let fileLoaded = false
-  const appData = {}
   let renderer
 
   const filterItemSelection = (item) => {
@@ -80,6 +68,11 @@
     const context = new AssetLoadContext()
     context.resources = resources
     context.camera = renderer.getViewport().getCamera()
+
+    const baseUrl = url.split('/').slice(0, -1).join('/')
+    context.xrefLoadCallback = (path, xref) => {
+      return baseUrl + '/' + path + '.zcad'
+    }
     asset.load(url, context).then(() => {
       console.log('Loading CAD File version:', asset.cadfileVersion, ' exported using SDK:', asset.sdk)
       const materiaLibrary = asset.getMaterialLibrary()
@@ -318,176 +311,6 @@
     }
     /** LOAD ASSETS END */
 
-    /** COLLAB START*/
-    // if (!embeddedMode) {
-    //   const userData = await auth.getUserData()
-    //   if (!userData) {
-    //     return
-    //   }
-    //   appData.userData = userData
-
-    //   if (collabEnabled) {
-    //     const SOCKET_URL = 'https://websocket-staging.zea.live'
-    //     // const roomId = assetUrl
-    //     const roomId = urlParams.get('roomId')
-    //     const session = new Session(userData, SOCKET_URL)
-    //     if (roomId) session.joinRoom(roomId)
-
-    //     const sessionSync = new SessionSync(session, appData, userData, {
-    //       /* Avatars scale based on the distance to the target */
-    //       scaleAvatarWithFocalDistance: true,
-    //       /* The overal size multiplier of the avatar. */
-    //       avatarScale: 2.0,
-    //     })
-
-    //     appData.session = session
-    //     appData.sessionSync = sessionSync
-
-    //     appData.session.sub('loadAsset', (data, user) => {
-    //       loadAsset(data.url, data.filename)
-    //     })
-
-    //     APP_DATA.update(() => appData)
-    //   }
-    // }
-    /** COLLAB END */
-
-    /** EMBED MESSAGING START*/
-    if (embeddedMode) {
-      const client = createClient()
-
-      let rootAsset
-
-      client.on('setBackgroundColor', (data) => {
-        const color = new Color(data.color)
-        $scene.getSettings().getParameter('BackgroundColor').setValue(color)
-      })
-
-      client.on('setHighlightColor', (data) => {
-        const color = new Color(data.color)
-        // Note: the alpha value determines  the fill of the highlight.
-        color.a = 0.1
-        $selectionManager.selectionGroup.getParameter('HighlightColor').setValue(color)
-        $selectionManager.selectionGroup.getParameter('SubtreeHighlightColor').setValue(color)
-      })
-
-      client.on('setRenderMode', (data) => {
-        changeRenderMode(RENDER_MODES[data.mode])
-      })
-
-      client.on('setCameraManipulationMode', (data) => {
-        const mode = data.mode.toLowerCase()
-        cameraManipulator.setDefaultManipulationMode(CameraManipulator.MANIPULATION_MODES[mode])
-      })
-
-      client.on('loadCADFile', (data) => {
-        console.log('loadCADFile', data)
-        if (!data.addToCurrentScene) {
-          $assets.removeAllChildren()
-        }
-
-        const asset = loadZCADAsset(data.url, data.resources)
-        if (!data.convertZtoY) {
-          // Rotate the model so 'up' is the correct direction
-          const xfo = asset.getParameter('LocalXfo').getValue()
-          xfo.ori.setFromAxisAndAngle(new Vec3(1, 0, 0), Math.PI * 0.5)
-
-          // const box = asset.getParameter('BoundingBox').getValue()
-          // xfo.tr.z = -box.p0.z
-          asset.getParameter('LocalXfo').setValue(xfo)
-        }
-        asset.once('loaded', () => {
-          console.log('loadCADFile', data._id)
-          if (data._id) {
-            const tree = buildTree(asset)
-            client.send(data._id, { modelStructure: tree })
-          }
-        })
-        rootAsset = asset
-      })
-
-      client.on('getModelStructure', (data) => {
-        if (data._id) {
-          const tree = buildTree($assets)
-          client.send(data._id, { modelStructure: tree })
-        }
-      })
-
-      let recievingSelectionnChange = false
-      client.on('selectItems', (data) => {
-        recievingSelectionnChange = true
-        const items = []
-        data.paths.forEach((path) => {
-          const treeItem = rootAsset.resolvePath(path)
-          if (treeItem) items.push(treeItem)
-        })
-        $selectionManager.selectItems(items, false)
-        recievingSelectionnChange = false
-      })
-      client.on('deselectItems', (data) => {
-        recievingSelectionnChange = true
-        console.log('deselectItems', data.paths)
-        const items = []
-        data.paths.forEach((path) => {
-          const treeItem = rootAsset.resolvePath(path)
-          if (treeItem) items.push(treeItem)
-        })
-        $selectionManager.deselectItems(items)
-        recievingSelectionnChange = false
-      })
-
-      client.on('unloadCADFile', (data) => {
-        console.log('unloadCADFile', data)
-
-        $assets.removeChildByName(data.name)
-
-        if (data._id) {
-          client.send(data._id, { done: true })
-        }
-      })
-
-      const findCADPart = (item) => {
-        // Propagate selections up from the edges and surfaces up to the CADPart
-        while (item && !(item instanceof CADPart)) {
-          item = item.getOwner()
-        }
-        return item
-      }
-
-      $selectionManager.on('selectionChanged', (event) => {
-        if (recievingSelectionnChange) return
-        const { selection, prevSelection } = event
-        const selectionPaths = []
-        selection.forEach((item) => {
-          if (!prevSelection.has(item)) {
-            const part = findCADPart(item)
-            if (part) {
-              // remove the 'root', 'AssetName' part of the path.
-              const path = part.getPath().slice(2)
-              selectionPaths.push(path)
-            }
-          }
-        })
-        const deselectionPaths = []
-        prevSelection.forEach((item) => {
-          if (!selection.has(item)) {
-            const part = findCADPart(item)
-            if (part) {
-              // remove the 'root', 'AssetName' part of the path.
-              const path = part.getPath().slice(2)
-              deselectionPaths.push(path)
-            }
-          }
-        })
-        console.log(selectionPaths, deselectionPaths)
-        client.send('selectionChanged', {
-          selection: selectionPaths,
-          deselection: deselectionPaths,
-        })
-      })
-    }
-    /** EMBED MESSAGING END */
-
     /** DYNAMIC SELECTION UI START */
     $selectionManager.on('leadSelectionChanged', (event) => {
       parameterOwner = event.treeItem
@@ -552,13 +375,6 @@
 </script>
 
 <main class="relative flex-1 Main">
-
-  {#if $ui.asmExplodeEnabled}
-  <div id="asmSlider">
-    <AsmExplode/>
-  </div>
-  {/if}
-
   <canvas bind:this={canvas} class="absolute w-full h-full" />
 
   <!-- <zea-view-cube id="view-cube" /> -->
@@ -614,10 +430,4 @@
   canvas {
     touch-action: none;
   }
-
-  #asmSlider {
-    display: flex;
-    align-items: center;
-  }
 </style>
-
