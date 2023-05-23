@@ -61,7 +61,7 @@
   })
 </script>
 
-<div class="absolute top-36 right-0 p-2 overflow-hidden pointer-events-none ParameterOwnerWidget grid w-120 space-y-2 ">
+<div class="absolute right-0 p-2 overflow-hidden pointer-events-none ParameterOwnerWidget grid w-120 space-y-2 ">
   {#each items as item (item.index)}
     <div class="flex items-center justify-end mr-2 text-black">
       {item.parameter.getName()}
@@ -74,6 +74,6 @@
 
 <style>
   .ParameterOwnerWidget {
-    grid-template-columns: 1fr 150px;
+    grid-template-columns: 1fr 500px;
   }
 </style>

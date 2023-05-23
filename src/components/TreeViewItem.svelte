@@ -104,8 +104,7 @@
   }
   const getChildren = (treeItem) => {
     if (treeItem instanceof InstanceItem && treeItem.getNumChildren() == 1) {
-      const referenceItem = treeItem.getChild(0)
-      return referenceItem.getChildren()
+      return treeItem.getChildren()
     } else {
       return treeItem.getChildren()
     }
